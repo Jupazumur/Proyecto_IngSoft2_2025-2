@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Formulario creado</title>
+  </head>
+  <body>
+    <h1>Formulario: {{ formulario.nombre }}</h1>
+    <p>{{ formulario.descripcion }}</p>
+
+    <h3>Preguntas</h3>
+    <ul>
+      {% for p in formulario.preguntas.all %}
+        <li>
+          <strong>{{ p.texto }}</strong> ({{ p.get_tipo_display }})
+          {% if p.opciones.exists %}
+            <ul>
+              {% for o in p.opciones.all %}
+                <li>{{ o.texto }} {% if o.correcta %}<strong>(correcta)</strong>{% endif %}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    <p>
+      <a href="{% url 'formulario:editar' pk=formulario.pk %}">Editar formulario</a> | 
+      <a href="{% url 'formulario:nuevo' %}">Crear otro formulario</a>
+    </p>
+  </body>
+</html>

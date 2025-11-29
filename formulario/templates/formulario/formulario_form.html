@@ -1,0 +1,207 @@
+{% load static %}
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Crear Formulario</title>
+    <style>label{display:block;margin-top:8px;} .pregunta{border:1px solid #ddd;padding:8px;margin:8px 0}</style>
+  </head>
+  <body>
+    <h1>{% if formulario %}Editar Formulario{% else %}Nuevo Formulario{% endif %}</h1>
+    <form method="post">
+      {% csrf_token %}
+      <label>Nombre
+        <input type="text" name="nombre" value="{% if formulario %}{{ formulario.nombre }}{% endif %}" required>
+      </label>
+      <label>Descripción
+        <textarea name="descripcion" rows="3">{% if formulario %}{{ formulario.descripcion }}{% endif %}</textarea>
+      </label>
+
+      <h3>Preguntas</h3>
+      <div id="preguntas"></div>
+      <button type="button" id="add">Añadir pregunta</button>
+
+      <div style="margin-top:12px">
+        <button type="submit">{% if formulario %}Guardar cambios{% else %}Guardar formulario{% endif %}</button>
+        {% if formulario %}
+          <a href="{% url 'formulario:detalle' pk=formulario.pk %}" style="margin-left:10px">Cancelar</a>
+        {% endif %}
+      </div>
+    </form>
+
+    <template id="tpl">
+      <div class="pregunta">
+        <label>Texto pregunta: <input type="text" name="pregunta_text"></label>
+        <label>Tipo:
+          <select name="pregunta_tipo" class="tipo">
+            <option value="abierta">Abierta</option>
+            <option value="opcion_multiple">Opción múltiple</option>
+          </select>
+        </label>
+        <div class="opciones_area" style="display:none">
+          <div class="opciones_list"></div>
+          <button type="button" class="add_option">Añadir opción</button>
+          <small>Marcar la opción correcta (una por pregunta)</small>
+        </div>
+        <button type="button" class="remove">Eliminar</button>
+      </div>
+    </template>
+
+    <script>
+      const add = document.getElementById('add');
+      const cont = document.getElementById('preguntas');
+      const tpl = document.getElementById('tpl');
+      let questionCounter = 0;
+      add.addEventListener('click', ()=>{
+        questionCounter += 1;
+        const qindex = questionCounter;
+        const node = tpl.content.firstElementChild.cloneNode(true);
+        node.dataset.qindex = qindex;
+        node.querySelector('.remove').addEventListener('click', ()=>node.remove());
+        const tipo = node.querySelector('.tipo');
+        const opcionesArea = node.querySelector('.opciones_area');
+        const addOptBtn = node.querySelector('.add_option');
+        const opcionesList = node.querySelector('.opciones_list');
+
+        function addOption(valueOrObj=''){
+          const wrap = document.createElement('div');
+          wrap.className = 'opcion_item';
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'correct_' + qindex;
+          radio.className = 'opt_correct';
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.placeholder = 'Texto de opción';
+          
+          // Manejar tanto string como objeto
+          if (typeof valueOrObj === 'object' && valueOrObj !== null) {
+            input.value = valueOrObj.text || '';
+            if (valueOrObj.correct) {
+              radio.checked = true;
+            }
+          } else {
+            input.value = valueOrObj || '';
+          }
+          
+          input.className = 'opt_input';
+          const rem = document.createElement('button');
+          rem.type = 'button';
+          rem.textContent = 'Eliminar opción';
+          rem.addEventListener('click', ()=>wrap.remove());
+          wrap.appendChild(radio);
+          wrap.appendChild(input);
+          wrap.appendChild(rem);
+          opcionesList.appendChild(wrap);
+        }
+
+        addOptBtn.addEventListener('click', ()=> addOption());
+
+        tipo.addEventListener('change', ()=>{
+          opcionesArea.style.display = tipo.value === 'opcion_multiple' ? 'block' : 'none';
+        });
+
+        cont.appendChild(node);
+      });
+      
+      // Cargar preguntas existentes si estamos editando
+      {% if preguntas_data_json %}
+        const preguntasExistentes = {{ preguntas_data_json }};
+        preguntasExistentes.forEach(function(preguntaData) {
+          // Crear la pregunta usando el mismo método que el botón
+          questionCounter += 1;
+          const qindex = questionCounter;
+          const node = tpl.content.firstElementChild.cloneNode(true);
+          node.dataset.qindex = qindex;
+          node.querySelector('.remove').addEventListener('click', ()=>node.remove());
+          const tipo = node.querySelector('.tipo');
+          const opcionesArea = node.querySelector('.opciones_area');
+          const addOptBtn = node.querySelector('.add_option');
+          const opcionesList = node.querySelector('.opciones_list');
+          
+          // Configurar valores de la pregunta
+          const textoInput = node.querySelector('input[name="pregunta_text"]');
+          if (textoInput) textoInput.value = preguntaData.texto || '';
+          if (tipo) {
+            tipo.value = preguntaData.tipo || 'abierta';
+            if (tipo.value === 'opcion_multiple') {
+              opcionesArea.style.display = 'block';
+            }
+          }
+          
+          // Función para añadir opción (mismo patrón que en el evento click)
+          function addOptionForEdit(valueOrObj=''){
+            const wrap = document.createElement('div');
+            wrap.className = 'opcion_item';
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'correct_' + qindex;
+            radio.className = 'opt_correct';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Texto de opción';
+            
+            if (typeof valueOrObj === 'object' && valueOrObj !== null) {
+              input.value = valueOrObj.text || '';
+              if (valueOrObj.correct) {
+                radio.checked = true;
+              }
+            } else {
+              input.value = valueOrObj || '';
+            }
+            
+            input.className = 'opt_input';
+            const rem = document.createElement('button');
+            rem.type = 'button';
+            rem.textContent = 'Eliminar opción';
+            rem.addEventListener('click', ()=>wrap.remove());
+            wrap.appendChild(radio);
+            wrap.appendChild(input);
+            wrap.appendChild(rem);
+            opcionesList.appendChild(wrap);
+          }
+          
+          addOptBtn.addEventListener('click', ()=> addOptionForEdit());
+          
+          tipo.addEventListener('change', ()=>{
+            opcionesArea.style.display = tipo.value === 'opcion_multiple' ? 'block' : 'none';
+          });
+          
+          cont.appendChild(node);
+          
+          // Cargar opciones si existen
+          if (preguntaData.opciones && preguntaData.opciones.length > 0) {
+            preguntaData.opciones.forEach(function(opcionData) {
+              addOptionForEdit(opcionData);
+            });
+          }
+        });
+      {% else %}
+        // Añadir una pregunta inicial solo si no hay preguntas existentes
+        add.click();
+      {% endif %}
+
+      // Antes de enviar, consolidar las opciones por pregunta en inputs ocultos (JSON)
+      const form = document.querySelector('form');
+      form.addEventListener('submit', (e)=>{
+        // borrar inputs ocultos previos si existen
+        document.querySelectorAll('input[name="pregunta_opciones"]').forEach(i=>i.remove());
+        // por cada pregunta, recoger las opciones
+        const preguntas = document.querySelectorAll('.pregunta');
+        preguntas.forEach(p => {
+          const opcionItems = Array.from(p.querySelectorAll('.opcion_item'));
+          const opts = opcionItems.map(item => {
+            const text = (item.querySelector('.opt_input') || {}).value || '';
+            const correct = !!(item.querySelector('.opt_correct') && item.querySelector('.opt_correct').checked);
+            return {text: text.trim(), correct: correct};
+          }).filter(o => o.text);
+          const hidden = document.createElement('input');
+          hidden.type = 'hidden';
+          hidden.name = 'pregunta_opciones';
+          hidden.value = JSON.stringify(opts);
+          form.appendChild(hidden);
+        });
+      });
+    </script>
+  </body>
+</html>

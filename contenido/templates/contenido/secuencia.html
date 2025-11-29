@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Secuencia Didáctica</title>
+    <style>
+        body { margin: 0; font-family: sans-serif; }
+        header { background: #003366; color: white; padding: 10px 20px; }
+        .navbar a { color: white; margin-right: 15px; text-decoration: none; }
+        .subheader { background: #005599; padding: 10px 20px; display: flex; align-items: center; }
+        .subnav a { color: white; margin-right: 20px; text-decoration: none; }
+        .layout { display: flex; }
+        .sidebar {
+            width: 250px;
+            background: #f4f4f4;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding: 15px;
+            box-shadow: inset -1px 0 0 #ddd;
+        }
+        .sidebar a { display: block; margin-bottom: 10px; text-decoration: none; color: #003366; }
+        .content {
+            flex: 1;
+            padding: 20px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+        /* Asegurar que las imágenes insertadas desde CKEditor no excedan el ancho del contenedor
+           y mantengan la proporción. También respetar las clases de alineación que pone CKEditor
+           (las clases suelen aplicarse al <figure> como "image-style-align-left/right/center"). */
+        .descripcion img,
+        .component img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Alineaciones generadas por CKEditor 5 (figures) */
+        .descripcion figure.image-style-align-left,
+        .component figure.image-style-align-left {
+            float: left;
+            margin: 0 1rem 1rem 0;
+            max-width: 50%;
+        }
+
+        .descripcion figure.image-style-align-right,
+        .component figure.image-style-align-right {
+            float: right;
+            margin: 0 0 1rem 1rem;
+            max-width: 50%;
+        }
+
+        .descripcion figure.image-style-align-center,
+        .component figure.image-style-align-center {
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            text-align: center;
+        }
+
+        /* Clearfix para evitar que los floats rompan el layout */
+        .descripcion:after,
+        .component:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        .activity { margin-bottom: 40px; border-bottom: 1px solid #ddd; padding-bottom: 20px; }
+        .component { background: #eef1f7; padding: 10px; margin: 10px 0; border-left: 4px solid #005599; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="navbar">
+        <strong>Plataforma</strong>
+        <a href="#">Inicio</a>
+        <a href="#">Cursos</a>
+        <a href="#">Ayuda</a>
+    </div>
+    <div style="float: right;">
+    {% if user.is_authenticated %}
+        {{ user.username }} |
+        <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" style="background:none;border:none;color:white;cursor:pointer;">
+        Cerrar sesión
+    </button>
+</form>
+    {% else %}
+        <a href="{% url 'register' %}">Registrarse</a> |
+        <a href="{% url 'login' %}?next={{ request.path }}">Iniciar sesión</a>
+    {% endif %}
+</div>
+
+</header>
+
+<div class="subheader">
+    <div class="subnav">
+        <a href="#">Curso</a>
+        <a href="#">Participantes</a>
+        <a href="#">Calificaciones</a>
+        <a href="#">Competencias</a>
+        <a href="{% url 'crear_actividad' %}" style="margin-left:20px;background:#005599;color:white;padding:6px 10px;border-radius:4px;text-decoration:none;">Nueva actividad</a>
+        <div class="dropdown">
+            <a href="#">Más ▼</a>
+            <div class="dropdown-content">
+                <a href="#">Configuración</a>
+                <a href="#">Historial</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="layout">
+    <aside class="sidebar">
+        {% for activity in activities %}
+            <a href="#actividad{{ activity.id }}">{{ activity.titulo }}</a>
+        {% endfor %}
+    </aside>
+
+    <main class="content">
+        {% for activity in activities %}
+            <div class="activity" id="actividad{{ activity.id }}">
+                <h2>{{ activity.titulo }}</h2>
+
+                <div style="margin-bottom:10px;">
+                    <a href="{% url 'agregar_componente' activity.id %}" style="font-size:0.9rem;">+ Añadir componente</a>
+                    &nbsp;|&nbsp;
+                    <a href="{% url 'editar_actividad' activity.id %}" style="font-size:0.9rem;">Editar actividad</a>
+                </div>
+
+                <div class="descripcion">
+                    {{ activity.descripcion|safe }}
+                </div>
+
+                {% for comp in activity.componentes.all %}
+                    <div class="component">
+                        {% if comp.tipo == "texto" %}
+                            <h3>Texto</h3>
+                            <p>{{ comp.contenido }}</p>
+                            <div style="margin-top:6px;font-size:0.9rem;">
+                                <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
+                            </div>
+                        {% elif comp.tipo == "foro" %}
+                            <h3>Foro</h3>
+                            <p>{{ comp.contenido }}</p>
+                            <div style="margin-top:6px;font-size:0.9rem;">
+                                <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
+                            </div>
+                            {% if comp.foro %}
+                                <a href="{% url 'foro_detalle' comp.foro.id %}">Entrar al foro</a>
+                            {% endif %}
+                        {% elif comp.tipo == "examen" %}
+                            <h3>Examen</h3>
+                            <p>{{ comp.contenido }}</p>
+                            <div style="margin-top:6px;font-size:0.9rem;">
+                                <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
+                            </div>
+                            {% if comp.formulario %}
+                                <a href="{% url 'examen_detalle' comp.id %}">Entrar al examen</a>
+                            {% endif %}
+                        {% elif comp.tipo == "recurso" %}
+                            <h3>Recurso</h3>
+                            <p>{{ comp.contenido }}</p>
+                            <div style="margin-top:6px;font-size:0.9rem;">
+                                <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </main>
+</div>
+
+</body>
+</html>

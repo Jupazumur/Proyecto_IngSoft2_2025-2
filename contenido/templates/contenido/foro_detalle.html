@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ foro.titulo }}</title>
+</head>
+<body>
+
+<h1>Foro: {{ foro.titulo }}</h1>
+
+<div>
+    {{ foro.descripcion|safe }}
+</div>
+
+<hr>
+
+<h2>Comentarios</h2>
+
+{% for comentario in comentarios %}
+    <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd;">
+        <strong>{{ comentario.usuario.username }}</strong>  
+        <em>{{ comentario.fecha }}</em>
+        <p>{{ comentario.texto }}</p>
+    </div>
+{% empty %}
+    <p>No hay comentarios.</p>
+{% endfor %}
+
+<hr>
+
+{% if user.is_authenticated %}
+<form method="post">
+    {% csrf_token %}
+    <textarea name="texto" rows="4" style="width:100%;"></textarea>
+    <button type="submit">Publicar</button>
+</form>
+{% else %}
+<p><a href="{% url 'login' %}?next={{ request.path }}">Inicia sesión para comentar</a></p>
+{% endif %}
+
+</body>
+</html>

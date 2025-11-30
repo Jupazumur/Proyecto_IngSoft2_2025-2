@@ -22,6 +22,7 @@ class Componente(models.Model):
         ("texto", "Texto"),
         ("foro", "Foro"),
         ("examen", "Examen"),
+        ("cuestionario", "Cuestionario"),
         ("recurso", "Recurso"),
     )
     actividad = models.ForeignKey(Actividad, related_name="componentes", on_delete=models.CASCADE)
@@ -62,6 +63,16 @@ class Examen(models.Model):
 
     def __str__(self):
         return self.titulo
+
+
+# CUESTIONARIO
+class Cuestionario(models.Model):
+    componente = models.OneToOneField(Componente, on_delete=models.CASCADE, related_name="cuestionario")
+    titulo = models.CharField(max_length=255)
+    descripcion = CKEditor5Field('Text', config_name='extends', blank=True)
+
+    def __str__(self):
+        return self.titulo
     
 @receiver(post_save, sender=Componente)
 def crear_foro_automatico(sender, instance, created, **kwargs):
@@ -78,5 +89,14 @@ def crear_examen_automatico(sender, instance, created, **kwargs):
         Examen.objects.create(
             componente=instance,
             titulo=instance.contenido or "Examen",
+            descripcion=""
+        )
+
+@receiver(post_save, sender=Componente)
+def crear_cuestionario_automatico(sender, instance, created, **kwargs):
+    if created and instance.tipo == "cuestionario":
+        Cuestionario.objects.create(
+            componente=instance,
+            titulo=instance.contenido or "Cuestionario",
             descripcion=""
         )

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Actividad, Foro, Comentario, Componente, Examen
+from .models import Actividad, Foro, Comentario, Componente, Examen, Cuestionario
 from formulario.models import Formulario
 from .forms import ActividadForm, ComponenteForm
 def examen_detalle(request, componente_id):
@@ -37,6 +37,46 @@ def examen_detalle(request, componente_id):
     return render(request, "contenido/examen_detalle.html", {
         "componente": componente,
         "examen": examen,
+        "formulario": formulario,
+        "preguntas": preguntas,
+        "mensaje": mensaje,
+    })
+
+def cuestionario_detalle(request, componente_id):
+    componente = get_object_or_404(Componente, id=componente_id, tipo="cuestionario")
+    cuestionario = get_object_or_404(Cuestionario, componente=componente)
+    formulario = componente.formulario
+    preguntas = formulario.preguntas.prefetch_related('opciones').all() if formulario else []
+    mensaje = None
+
+    if request.method == "POST":
+        if not request.user.is_authenticated:
+            mensaje = "Debes iniciar sesión para responder el cuestionario."
+        else:
+            from formulario.models import Respuesta, Opcion
+            for pregunta in preguntas:
+                key = f"pregunta_{pregunta.id}"
+                valor = request.POST.get(key)
+                if pregunta.tipo == 'abierta':
+                    if valor:
+                        Respuesta.objects.create(
+                            pregunta=pregunta,
+                            texto=valor,
+                            usuario=request.user.username
+                        )
+                elif pregunta.tipo == 'opcion_multiple':
+                    if valor:
+                        opcion = Opcion.objects.filter(id=valor, pregunta=pregunta).first()
+                        Respuesta.objects.create(
+                            pregunta=pregunta,
+                            opcion=opcion,
+                            usuario=request.user.username
+                        )
+            mensaje = "Respuestas enviadas correctamente."
+
+    return render(request, "contenido/cuestionario_detalle.html", {
+        "componente": componente,
+        "cuestionario": cuestionario,
         "formulario": formulario,
         "preguntas": preguntas,
         "mensaje": mensaje,

@@ -160,6 +160,15 @@
                             {% if comp.formulario %}
                                 <a href="{% url 'examen_detalle' comp.id %}">Entrar al examen</a>
                             {% endif %}
+                        {% elif comp.tipo == "cuestionario" %}
+                            <h3>Cuestionario</h3>
+                            <p>{{ comp.contenido }}</p>
+                            <div style="margin-top:6px;font-size:0.9rem;">
+                                <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
+                            </div>
+                            {% if comp.formulario %}
+                                <a href="{% url 'cuestionario_detalle' comp.id %}">Entrar al cuestionario</a>
+                            {% endif %}
                         {% elif comp.tipo == "recurso" %}
                             <h3>Recurso</h3>
                             <p>{{ comp.contenido }}</p>

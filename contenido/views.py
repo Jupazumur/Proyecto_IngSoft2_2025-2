@@ -91,12 +91,18 @@ def editar_componente(request, componente_id):
     componente = get_object_or_404(Componente, id=componente_id)
     actividad = componente.actividad
     if request.method == 'POST':
-        form = ComponenteForm(request.POST, instance=componente)
+        # Excluir el campo tipo del POST para que no se pueda modificar
+        post_data = request.POST.copy()
+        form = ComponenteForm(post_data, instance=componente)
+        # Excluir el campo tipo del formulario
+        form.fields.pop('tipo', None)
         if form.is_valid():
             form.save()
             return redirect('teaching_sequence')
     else:
         form = ComponenteForm(instance=componente)
+        # Excluir el campo tipo del formulario al editar
+        form.fields.pop('tipo', None)
     return render(request, 'contenido/componente_form.html', {'form': form, 'actividad': actividad, 'componente': componente})
 
 def register(request):

@@ -18,6 +18,7 @@
     <form method="post">
         {% csrf_token %}
         
+        {% if not componente %}
         <div class="form-field">
             <label for="{{ form.tipo.id_for_label }}">{{ form.tipo.label }}</label>
             {{ form.tipo }}
@@ -29,6 +30,7 @@
                 </ul>
             {% endif %}
         </div>
+        {% endif %}
         
         <div class="form-field">
             <label for="{{ form.contenido.id_for_label }}">{{ form.contenido.label }}</label>

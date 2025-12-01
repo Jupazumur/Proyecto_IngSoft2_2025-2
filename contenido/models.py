@@ -98,3 +98,15 @@ def crear_cuestionario_automatico(sender, instance, created, **kwargs):
             titulo=instance.contenido or "Cuestionario",
             descripcion=""
         )
+
+@receiver(post_save, sender=Componente)
+def crear_formulario_automatico(sender, instance, created, **kwargs):
+    if created and instance.tipo in ["examen", "cuestionario"] and not instance.formulario:
+        # Crear un formulario automáticamente
+        nombre_formulario = f"Formulario de {instance.tipo.capitalize()} - {instance.actividad.titulo}"
+        formulario = Formulario.objects.create(
+            nombre=nombre_formulario,
+            descripcion=f"Formulario asociado al {instance.tipo} de la actividad: {instance.actividad.titulo}"
+        )
+        # Asignar el formulario al componente usando update para evitar disparar otra señal
+        Componente.objects.filter(id=instance.id).update(formulario=formulario)

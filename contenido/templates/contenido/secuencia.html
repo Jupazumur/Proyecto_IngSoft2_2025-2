@@ -138,7 +138,7 @@
                     <div class="component">
                         {% if comp.tipo == "foro" %}
                             <h3>Foro</h3>
-                            <p>{{ comp.contenido }}</p>
+                            <p>{{ comp.titulo }}</p>
                             <div style="margin-top:6px;font-size:0.9rem;">
                                 <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
                             </div>
@@ -147,7 +147,7 @@
                             {% endif %}
                         {% elif comp.tipo == "examen" %}
                             <h3>Examen</h3>
-                            <p>{{ comp.contenido }}</p>
+                            <p>{{ comp.titulo }}</p>
                             <div style="margin-top:6px;font-size:0.9rem;">
                                 <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
                             </div>
@@ -156,7 +156,7 @@
                             {% endif %}
                         {% elif comp.tipo == "cuestionario" %}
                             <h3>Cuestionario</h3>
-                            <p>{{ comp.contenido }}</p>
+                            <p>{{ comp.titulo }}</p>
                             <div style="margin-top:6px;font-size:0.9rem;">
                                 <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
                             </div>

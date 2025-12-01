@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django_ckeditor_5.fields import CKEditor5Field
 
-# ACTIVIDAD Y COMPONENTES (componentes van en actividades)
+### ACTIVIDAD Y COMPONENTES ###
 class Actividad(models.Model):
     titulo = models.CharField(max_length=200)
     descripcion = CKEditor5Field('Text', config_name='extends', blank=True)
@@ -14,9 +14,9 @@ class Actividad(models.Model):
         return self.titulo
 
 
-
 from formulario.models import Formulario
 
+# Componentes se encarga de crear y enlazar los modelos de los tipos a una actividad
 class Componente(models.Model):
     TIPOS = (
         ("foro", "Foro"),
@@ -25,14 +25,13 @@ class Componente(models.Model):
     )
     actividad = models.ForeignKey(Actividad, related_name="componentes", on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=TIPOS)
-    contenido = models.TextField(blank=True)
+    titulo = models.TextField(blank=True)
     formulario = models.ForeignKey(Formulario, null=True, blank=True, on_delete=models.SET_NULL, related_name="componentes")
 
     def __str__(self):
         return f"{self.tipo} - {self.actividad.titulo}"
 
-
-# FORO
+### FORO Y COMENTARIOS ###
 class Foro(models.Model):
     componente = models.OneToOneField(Componente, on_delete=models.CASCADE, related_name="foro")
     titulo = models.CharField(max_length=255)
@@ -41,8 +40,6 @@ class Foro(models.Model):
     def __str__(self):
         return self.titulo
 
-
-# COMENTARIOS DENTRO DE FORO
 class Comentario(models.Model):
     foro = models.ForeignKey(Foro, related_name="comentarios", on_delete=models.CASCADE)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -52,8 +49,9 @@ class Comentario(models.Model):
     def __str__(self):
         return f"Comentario de {self.usuario.username}"
 
+### EXAMEN Y CUESTIONARIO ###
+## Examen y Cuestionario son practicamente lo mismo, solo que Examen no tiene disponible el bloque
 
-# EXAMEN
 class Examen(models.Model):
     componente = models.OneToOneField(Componente, on_delete=models.CASCADE, related_name="examen")
     titulo = models.CharField(max_length=255)
@@ -62,8 +60,6 @@ class Examen(models.Model):
     def __str__(self):
         return self.titulo
 
-
-# CUESTIONARIO
 class Cuestionario(models.Model):
     componente = models.OneToOneField(Componente, on_delete=models.CASCADE, related_name="cuestionario")
     titulo = models.CharField(max_length=255)
@@ -71,42 +67,48 @@ class Cuestionario(models.Model):
 
     def __str__(self):
         return self.titulo
-    
+
+### CREACION DE MODELOS AUTOMATICOS AL CREAR COMPONENTES ###
+
+# Crear modelo Foro al crear componente tipo Foro
 @receiver(post_save, sender=Componente)
 def crear_foro_automatico(sender, instance, created, **kwargs):
     if created and instance.tipo == "foro":
         Foro.objects.create(
             componente=instance,
-            titulo=instance.contenido or "Foro",
+            titulo=instance.titulo or "Foro",
             descripcion=""
         )
 
+# Crear modelo Examen al crear componente tipo Examen
 @receiver(post_save, sender=Componente)
 def crear_examen_automatico(sender, instance, created, **kwargs):
     if created and instance.tipo == "examen":
         Examen.objects.create(
             componente=instance,
-            titulo=instance.contenido or "Examen",
+            titulo=instance.titulo or "Examen",
             descripcion=""
         )
 
+# Crear modelo Cuestionario al crear componente tipo Cuestionario
 @receiver(post_save, sender=Componente)
 def crear_cuestionario_automatico(sender, instance, created, **kwargs):
     if created and instance.tipo == "cuestionario":
         Cuestionario.objects.create(
             componente=instance,
-            titulo=instance.contenido or "Cuestionario",
+            titulo=instance.titulo or "Cuestionario",
             descripcion=""
         )
 
+# Crear automaticamente Formulario al crear Examen o Cuestionario
 @receiver(post_save, sender=Componente)
 def crear_formulario_automatico(sender, instance, created, **kwargs):
     if created and instance.tipo in ["examen", "cuestionario"] and not instance.formulario:
-        # Crear un formulario automáticamente
+
         nombre_formulario = f"Formulario de {instance.tipo.capitalize()} - {instance.actividad.titulo}"
         formulario = Formulario.objects.create(
             nombre=nombre_formulario,
             descripcion=f"Formulario asociado al {instance.tipo} de la actividad: {instance.actividad.titulo}"
         )
-        # Asignar el formulario al componente usando update para evitar disparar otra señal
+
         Componente.objects.filter(id=instance.id).update(formulario=formulario)

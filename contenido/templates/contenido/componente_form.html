@@ -33,11 +33,11 @@
         {% endif %}
         
         <div class="form-field">
-            <label for="{{ form.contenido.id_for_label }}">{{ form.contenido.label }}</label>
-            {{ form.contenido }}
-            {% if form.contenido.errors %}
+            <label for="{{ form.titulo.id_for_label }}">{{ form.titulo.label }}</label>
+            {{ form.titulo }}
+            {% if form.titulo.errors %}
                 <ul class="errorlist">
-                    {% for error in form.contenido.errors %}
+                    {% for error in form.titulo.errors %}
                         <li>{{ error }}</li>
                     {% endfor %}
                 </ul>

@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Actividad, Foro, Comentario, Componente, Examen, Cuestionario
 from formulario.models import Formulario
 from .forms import ActividadForm, ComponenteForm
+
 def examen_detalle(request, componente_id):
     componente = get_object_or_404(Componente, id=componente_id, tipo="examen")
     examen = get_object_or_404(Examen, componente=componente)

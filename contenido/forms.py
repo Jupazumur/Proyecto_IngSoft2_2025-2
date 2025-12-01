@@ -11,4 +11,4 @@ class ActividadForm(forms.ModelForm):
 class ComponenteForm(forms.ModelForm):
     class Meta:
         model = Componente
-        fields = ["tipo", "contenido", "formulario"]
+        fields = ["tipo", "titulo", "formulario"]

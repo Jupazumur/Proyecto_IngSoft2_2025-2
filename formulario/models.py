@@ -33,7 +33,7 @@ class Respuesta(models.Model):
 	pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE)
 	opcion = models.ForeignKey(Opcion, null=True, blank=True, on_delete=models.SET_NULL)
 	texto = models.TextField(blank=True)
-	usuario = models.CharField(max_length=150, blank=True)  # Opcional: para identificar quién responde
+	usuario = models.CharField(max_length=150, blank=True)
 	fecha = models.DateTimeField(auto_now_add=True)
 
 	def __str__(self):

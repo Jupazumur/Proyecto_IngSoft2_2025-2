@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Actividad, Foro, Comentario, Componente, Examen, Cuestionario
 from formulario.models import Formulario
-from .forms import ActividadForm, ComponenteForm, ForoForm
+from .forms import ActividadForm, ComponenteForm, ForoForm, ExamenDescForm, CuestionarioDescForm
 
 def examen_detalle(request, componente_id):
     componente = get_object_or_404(Componente, id=componente_id, tipo="examen")
@@ -197,3 +197,38 @@ def editar_foro(request, foro_id):
     else:
         form = ForoForm(instance=foro)
     return render(request, 'contenido/editar_foro.html', {'form': form, 'foro': foro})
+
+def editar_examen_desc(request, componente_id):
+    componente = get_object_or_404(Componente, id=componente_id, tipo="examen")
+    examen = get_object_or_404(Examen, componente=componente)
+
+    if request.method == "POST":
+        form = ExamenDescForm(request.POST, instance=examen)
+        if form.is_valid():
+            form.save()
+            return redirect("examen_detalle", componente_id=componente.id)
+    else:
+        form = ExamenDescForm(instance=examen)
+
+    return render(request, "contenido/editar_desc.html", {
+        "form": form,
+        "examen": examen,
+    })
+
+
+def editar_cuestionario_desc(request, componente_id):
+    componente = get_object_or_404(Componente, id=componente_id, tipo="cuestionario")
+    cuestionario = get_object_or_404(Cuestionario, componente=componente)
+
+    if request.method == "POST":
+        form = CuestionarioDescForm(request.POST, instance=cuestionario)
+        if form.is_valid():
+            form.save()
+            return redirect("cuestionario_detalle", componente_id=componente.id)
+    else:
+        form = CuestionarioDescForm(instance=cuestionario)
+
+    return render(request, "contenido/editar_desc.html", {
+        "form": form,
+        "cuestionario": cuestionario,
+    })

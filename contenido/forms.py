@@ -1,5 +1,5 @@
 from django import forms
-from .models import Actividad, Componente, Foro
+from .models import Actividad, Componente, Foro, Examen, Cuestionario
 
 
 class ActividadForm(forms.ModelForm):
@@ -17,4 +17,14 @@ class ComponenteForm(forms.ModelForm):
 class ForoForm(forms.ModelForm):
     class Meta:
         model = Foro
+        fields = ["descripcion"]
+
+class ExamenDescForm(forms.ModelForm):
+    class Meta:
+        model = Examen
+        fields = ["descripcion"]
+
+class CuestionarioDescForm(forms.ModelForm):
+    class Meta:
+        model = Cuestionario
         fields = ["descripcion"]

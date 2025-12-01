@@ -141,6 +141,7 @@
                             <p>{{ comp.titulo }}</p>
                             <div style="margin-top:6px;font-size:0.9rem;">
                                 <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
+                                <a href="{% url 'editar_foro' foro_id=comp.foro.id %}">Editar descripción</a>
                             </div>
                             {% if comp.foro %}
                                 <a href="{% url 'foro_detalle' comp.foro.id %}">Entrar al foro</a>
@@ -150,6 +151,7 @@
                             <p>{{ comp.titulo }}</p>
                             <div style="margin-top:6px;font-size:0.9rem;">
                                 <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
+                                <a href="{% url 'editar_examen_desc' comp.id %}">Editar descripción</a>
                             </div>
                             {% if comp.formulario %}
                                 <a href="{% url 'examen_detalle' comp.id %}">Entrar al examen</a>
@@ -159,6 +161,7 @@
                             <p>{{ comp.titulo }}</p>
                             <div style="margin-top:6px;font-size:0.9rem;">
                                 <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
+                                <a href="{% url 'editar_cuestionario_desc' comp.id %}">Editar descripción</a>
                             </div>
                             {% if comp.formulario %}
                                 <a href="{% url 'cuestionario_detalle' comp.id %}">Entrar al cuestionario</a>

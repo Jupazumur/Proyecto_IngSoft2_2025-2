@@ -44,6 +44,7 @@
             {% endif %}
         </div>
         
+        {% if not componente or componente.tipo != "foro" %}
         <div class="form-field">
             <label for="{{ form.formulario.id_for_label }}">{{ form.formulario.label }}</label>
             <div class="formulario-field-container">
@@ -60,6 +61,7 @@
                 </ul>
             {% endif %}
         </div>
+        {% endif %}
         
         <button type="submit">{% if componente %}Guardar cambios{% else %}Crear componente{% endif %}</button>
         <a href="{% url 'teaching_sequence' %}">Volver</a>

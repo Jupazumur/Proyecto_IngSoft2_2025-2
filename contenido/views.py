@@ -136,6 +136,9 @@ def editar_componente(request, componente_id):
         form = ComponenteForm(post_data, instance=componente)
         # Excluir el campo tipo del formulario
         form.fields.pop('tipo', None)
+        # Excluir el campo formulario si el tipo es "foro"
+        if componente.tipo == "foro":
+            form.fields.pop('formulario', None)
         if form.is_valid():
             form.save()
             return redirect('teaching_sequence')
@@ -143,6 +146,9 @@ def editar_componente(request, componente_id):
         form = ComponenteForm(instance=componente)
         # Excluir el campo tipo del formulario al editar
         form.fields.pop('tipo', None)
+        # Excluir el campo formulario si el tipo es "foro"
+        if componente.tipo == "foro":
+            form.fields.pop('formulario', None)
     return render(request, 'contenido/componente_form.html', {'form': form, 'actividad': actividad, 'componente': componente})
 
 def register(request):

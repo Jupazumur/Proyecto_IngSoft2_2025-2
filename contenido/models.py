@@ -112,3 +112,20 @@ def crear_formulario_automatico(sender, instance, created, **kwargs):
         )
 
         Componente.objects.filter(id=instance.id).update(formulario=formulario)
+
+# Sincronizar titulo del componente con el modelo relacionado
+@receiver(post_save, sender=Componente)
+def sincronizar_titulo_componente(sender, instance, created, **kwargs):
+    if not created:  # Solo cuando se actualiza, no cuando se crea
+        if instance.tipo == "foro" and hasattr(instance, 'foro'):
+            if instance.foro.titulo != instance.titulo:
+                instance.foro.titulo = instance.titulo
+                instance.foro.save(update_fields=['titulo'])
+        elif instance.tipo == "examen" and hasattr(instance, 'examen'):
+            if instance.examen.titulo != instance.titulo:
+                instance.examen.titulo = instance.titulo
+                instance.examen.save(update_fields=['titulo'])
+        elif instance.tipo == "cuestionario" and hasattr(instance, 'cuestionario'):
+            if instance.cuestionario.titulo != instance.titulo:
+                instance.cuestionario.titulo = instance.titulo
+                instance.cuestionario.save(update_fields=['titulo'])

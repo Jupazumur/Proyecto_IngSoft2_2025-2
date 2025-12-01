@@ -145,6 +145,7 @@ def editar_componente(request, componente_id):
         form.fields.pop('formulario', None)
         if form.is_valid():
             form.save()
+            # titulo se sincroniza automaticamente mediante el signal post_save en models.py
             return redirect('teaching_sequence')
     else:
         form = ComponenteForm(instance=componente)

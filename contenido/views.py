@@ -105,6 +105,8 @@ def agregar_componente(request, actividad_id):
     actividad = get_object_or_404(Actividad, id=actividad_id)
     if request.method == 'POST':
         form = ComponenteForm(request.POST)
+        # Excluir el campo formulario al crear
+        form.fields.pop('formulario', None)
         if form.is_valid():
             comp = form.save(commit=False)
             comp.actividad = actividad
@@ -112,6 +114,8 @@ def agregar_componente(request, actividad_id):
             return redirect('teaching_sequence')
     else:
         form = ComponenteForm()
+        # Excluir el campo formulario al crear
+        form.fields.pop('formulario', None)
     return render(request, 'contenido/componente_form.html', {'form': form, 'actividad': actividad})
 
 
@@ -136,9 +140,8 @@ def editar_componente(request, componente_id):
         form = ComponenteForm(post_data, instance=componente)
         # Excluir el campo tipo del formulario
         form.fields.pop('tipo', None)
-        # Excluir el campo formulario si el tipo es "foro"
-        if componente.tipo == "foro":
-            form.fields.pop('formulario', None)
+        # Excluir el campo formulario (no se puede cambiar desde aquí, solo editar si existe)
+        form.fields.pop('formulario', None)
         if form.is_valid():
             form.save()
             return redirect('teaching_sequence')
@@ -146,9 +149,8 @@ def editar_componente(request, componente_id):
         form = ComponenteForm(instance=componente)
         # Excluir el campo tipo del formulario al editar
         form.fields.pop('tipo', None)
-        # Excluir el campo formulario si el tipo es "foro"
-        if componente.tipo == "foro":
-            form.fields.pop('formulario', None)
+        # Excluir el campo formulario (no se puede cambiar desde aquí, solo editar si existe)
+        form.fields.pop('formulario', None)
     return render(request, 'contenido/componente_form.html', {'form': form, 'actividad': actividad, 'componente': componente})
 
 def register(request):

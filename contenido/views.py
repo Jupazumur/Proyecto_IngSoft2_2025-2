@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Actividad, Foro, Comentario, Componente, Examen, Cuestionario
 from formulario.models import Formulario
-from .forms import ActividadForm, ComponenteForm
+from .forms import ActividadForm, ComponenteForm, ForoForm
 
 def examen_detalle(request, componente_id):
     componente = get_object_or_404(Componente, id=componente_id, tipo="examen")
@@ -185,3 +185,15 @@ def foro_detalle(request, foro_id):
         "foro": foro,
         "comentarios": comentarios
     })
+
+
+def editar_foro(request, foro_id):
+    foro = get_object_or_404(Foro, id=foro_id)
+    if request.method == 'POST':
+        form = ForoForm(request.POST, instance=foro)
+        if form.is_valid():
+            form.save()
+            return redirect('foro_detalle', foro_id=foro.id)
+    else:
+        form = ForoForm(instance=foro)
+    return render(request, 'contenido/editar_foro.html', {'form': form, 'foro': foro})

@@ -136,13 +136,7 @@
 
                 {% for comp in activity.componentes.all %}
                     <div class="component">
-                        {% if comp.tipo == "texto" %}
-                            <h3>Texto</h3>
-                            <p>{{ comp.contenido }}</p>
-                            <div style="margin-top:6px;font-size:0.9rem;">
-                                <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
-                            </div>
-                        {% elif comp.tipo == "foro" %}
+                        {% if comp.tipo == "foro" %}
                             <h3>Foro</h3>
                             <p>{{ comp.contenido }}</p>
                             <div style="margin-top:6px;font-size:0.9rem;">
@@ -169,12 +163,6 @@
                             {% if comp.formulario %}
                                 <a href="{% url 'cuestionario_detalle' comp.id %}">Entrar al cuestionario</a>
                             {% endif %}
-                        {% elif comp.tipo == "recurso" %}
-                            <h3>Recurso</h3>
-                            <p>{{ comp.contenido }}</p>
-                            <div style="margin-top:6px;font-size:0.9rem;">
-                                <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
-                            </div>
                         {% endif %}
                     </div>
                 {% endfor %}

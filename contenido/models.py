@@ -19,11 +19,9 @@ from formulario.models import Formulario
 
 class Componente(models.Model):
     TIPOS = (
-        ("texto", "Texto"),
         ("foro", "Foro"),
         ("examen", "Examen"),
         ("cuestionario", "Cuestionario"),
-        ("recurso", "Recurso"),
     )
     actividad = models.ForeignKey(Actividad, related_name="componentes", on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=TIPOS)

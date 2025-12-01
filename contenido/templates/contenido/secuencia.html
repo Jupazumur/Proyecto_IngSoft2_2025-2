@@ -79,6 +79,7 @@
         <a href="#">Ayuda</a>
     </div>
     <div style="float: right;">
+
     {% if user.is_authenticated %}
         {{ user.username }} |
         <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: inline;">
@@ -86,6 +87,7 @@
     <button type="submit" style="background:none;border:none;color:white;cursor:pointer;">
         Cerrar sesión
     </button>
+    
 </form>
     {% else %}
         <a href="{% url 'register' %}">Registrarse</a> |

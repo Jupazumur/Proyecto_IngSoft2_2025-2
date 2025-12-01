@@ -7,7 +7,7 @@
 <body>
 
 <h1>Foro: {{ foro.titulo }}</h1>
-
+{% if user.is_authenticated %}
 <div>
     {{ foro.descripcion|safe }}
 </div>
@@ -28,15 +28,17 @@
 
 <hr>
 
-{% if user.is_authenticated %}
 <form method="post">
     {% csrf_token %}
     <textarea name="texto" rows="4" style="width:100%;"></textarea>
     <button type="submit">Publicar</button>
 </form>
+
 {% else %}
-<p><a href="{% url 'login' %}?next={{ request.path }}">Inicia sesión para comentar</a></p>
+<p><a href="{% url 'login' %}?next={{ request.path }}">Inicia sesión para ver y comentar</a></p>
 {% endif %}
+
+<a href="{% url 'teaching_sequence' %}">Volver</a>
 
 </body>
 </html>

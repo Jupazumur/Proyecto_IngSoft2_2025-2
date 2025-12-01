@@ -79,9 +79,11 @@
         <button type="submit">Guardar cambios</button>
 
         {% if examen %}
-            <a href="{% url 'examen_detalle' examen.componente.id %}">Cancelar</a>
+            <!--- <a href="{% url 'examen_detalle' examen.componente.id %}">Cancelar</a> --->
+            <a href="{% url 'teaching_sequence' %}">Cancelar</a>
         {% elif cuestionario %}
-            <a href="{% url 'cuestionario_detalle' cuestionario.componente.id %}">Cancelar</a>
+            <!--- <a href="{% url 'cuestionario_detalle' cuestionario.componente.id %}"> Cancelar </a> --->
+            <a href="{% url 'teaching_sequence' %}">Cancelar</a>
         {% else %}
             <a href="{% url 'teaching_sequence' %}">Cancelar</a>
         {% endif %}

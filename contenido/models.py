@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 #from ckeditor_uploader.fields import RichTextUploadingField
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django_ckeditor_5.fields import CKEditor5Field
 
@@ -129,3 +129,21 @@ def sincronizar_titulo_componente(sender, instance, created, **kwargs):
             if instance.cuestionario.titulo != instance.titulo:
                 instance.cuestionario.titulo = instance.titulo
                 instance.cuestionario.save(update_fields=['titulo'])
+
+# Borrar Formulario asociado cuando se borra un Componente
+@receiver(pre_delete, sender=Componente)
+def borrar_formulario_al_borrar_componente(sender, instance, **kwargs):
+    """
+    Al borrar un Componente, se borra automáticamente su Formulario asociado.
+    Esto asegura que:
+    - Componente -> borra Foro/Examen/Cuestionario (por CASCADE en OneToOneField)
+    - Componente -> borra Formulario (por esta señal)
+    - Formulario -> borra Preguntas (por CASCADE)
+    - Preguntas -> borra Opciones y Respuestas (por CASCADE)
+    """
+    if instance.formulario:
+        # Verificar si el Formulario está asociado solo a este Componente
+        # Si está asociado a otros Componentes, no lo borramos (nunca debería ocurrir)
+        otros_componentes = Componente.objects.filter(formulario=instance.formulario).exclude(id=instance.id)
+        if not otros_componentes.exists():
+            instance.formulario.delete()

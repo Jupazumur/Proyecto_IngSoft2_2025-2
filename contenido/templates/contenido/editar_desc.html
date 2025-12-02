@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>
+        {% if examen %}
+            Editar descripción del Examen: {{ examen.titulo }}
+        {% elif cuestionario %}
+            Editar descripción del Cuestionario: {{ cuestionario.titulo }}
+        {% else %}
+            Editar descripción
+        {% endif %}
+    </title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .errorlist {
+            color: red;
+            list-style: none;
+            padding: 0;
+        }
+    </style>
+    {% if form.media %}{{ form.media }}{% endif %}
+</head>
+<body>
+    <h1>
+        {% if examen %}
+            Editar descripción del Examen: {{ examen.titulo }}
+        {% elif cuestionario %}
+            Editar descripción del Cuestionario: {{ cuestionario.titulo }}
+        {% else %}
+            Editar descripción
+        {% endif %}
+    </h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-field">
+            <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
+            {{ form.descripcion }}
+            {% if form.descripcion.errors %}
+                <ul class="errorlist">
+                    {% for error in form.descripcion.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <button type="submit">Guardar cambios</button>
+
+        {% if examen %}
+            <!--- <a href="{% url 'examen_detalle' examen.componente.id %}">Cancelar</a> --->
+            <a href="{% url 'teaching_sequence' %}">Cancelar</a>
+        {% elif cuestionario %}
+            <!--- <a href="{% url 'cuestionario_detalle' cuestionario.componente.id %}"> Cancelar </a> --->
+            <a href="{% url 'teaching_sequence' %}">Cancelar</a>
+        {% else %}
+            <a href="{% url 'teaching_sequence' %}">Cancelar</a>
+        {% endif %}
+    </form>
+</body>
+</html>
+
+

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Nuevo Componente</title>
+    <style>
+        body{font-family:sans-serif;padding:20px}
+        .form-field {margin-bottom:15px}
+        .form-field label {display:block;margin-bottom:5px;font-weight:bold}
+        .formulario-field-container {display:flex;align-items:flex-start;gap:10px}
+        .formulario-field-container select {flex:1}
+        .formulario-field-container a {padding:6px 12px;text-decoration:none;background-color:#007bff;color:white;border-radius:4px;white-space:nowrap}
+        .formulario-field-container a:hover {background-color:#0056b3}
+    </style>
+</head>
+<body>
+    <h1>{% if componente %}Editar componente para: {{ actividad.titulo }}{% else %}Nuevo componente para: {{ actividad.titulo }}{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if not componente %}
+        <div class="form-field">
+            <label for="{{ form.tipo.id_for_label }}">{{ form.tipo.label }}</label>
+            {{ form.tipo }}
+            {% if form.tipo.errors %}
+                <ul class="errorlist">
+                    {% for error in form.tipo.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <div class="form-field">
+            <label for="{{ form.titulo.id_for_label }}">{{ form.titulo.label }}</label>
+            {{ form.titulo }}
+            {% if form.titulo.errors %}
+                <ul class="errorlist">
+                    {% for error in form.titulo.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        {% if componente and componente.tipo != "foro" and componente.formulario %}
+        <div class="form-field" id="formulario-field-container">
+            <label>Formulario</label>
+            <div class="formulario-field-container">
+                <a id="formulario-btn" href="{% url 'formulario:editar' pk=componente.formulario.id %}">
+                    Editar formulario
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <button type="submit">{% if componente %}Guardar cambios{% else %}Crear componente{% endif %}</button>
+        <a href="{% url 'teaching_sequence' %}">Volver</a>
+    </form>
+    
+</body>
+</html>

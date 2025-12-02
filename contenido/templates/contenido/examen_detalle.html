@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Examen: {{ examen.titulo }}</title>
+</head>
+<body>
+
+
+<h1>Examen: {{ examen.titulo }}</h1>
+
+{% if examen.descripcion %}
+<div>
+    {{ examen.descripcion|safe }}
+</div>
+{% endif %}
+
+<hr>
+
+{% if mensaje %}
+    <p style="color: green;">{{ mensaje }}</p>
+{% endif %}
+
+{% if preguntas %}
+    {% if user.is_authenticated %}
+        <form method="post">
+            {% csrf_token %}
+            {% for pregunta in preguntas %}
+                <div style="margin-bottom: 20px;">
+                    <strong>{{ forloop.counter }}. {{ pregunta.texto }}</strong><br>
+                    {% if pregunta.tipo == 'abierta' %}
+                        <textarea name="pregunta_{{ pregunta.id }}" rows="2" style="width:100%;"></textarea>
+                    {% elif pregunta.tipo == 'opcion_multiple' %}
+                        {% for opcion in pregunta.opciones.all %}
+                            <label>
+                                <input type="radio" name="pregunta_{{ pregunta.id }}" value="{{ opcion.id }}"> {{ opcion.texto }}
+                            </label><br>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit">Enviar respuestas</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}?next={{ request.path }}">Inicia sesión para responder el examen</a></p>
+    {% endif %}
+{% else %}
+    <p>No hay preguntas en este examen.</p>
+{% endif %}
+<a href="{% url 'teaching_sequence' %}">Volver</a>
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Eliminar Componente</title>
+    <style>
+        body{font-family:sans-serif;padding:20px}
+        .confirm-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .confirm-box h2 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .button-group {
+            margin-top: 20px;
+        }
+        button, a.button {
+            padding: 8px 16px;
+            margin-right: 10px;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+        button[type="submit"] {
+            background-color: #dc3545;
+            color: white;
+        }
+        button[type="submit"]:hover {
+            background-color: #c82333;
+        }
+        a.button {
+            background-color: #6c757d;
+            color: white;
+        }
+        a.button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <h1>Eliminar Componente</h1>
+    <div class="confirm-box">
+        <h2>¿Está seguro que desea eliminar este componente?</h2>
+        <p><strong>Tipo:</strong> {{ componente.get_tipo_display }}</p>
+        <p><strong>Título:</strong> {{ componente.titulo }}</p>
+        <p><strong>Actividad:</strong> {{ componente.actividad.titulo }}</p>
+        <p style="color: #856404; font-weight: bold;">Esta acción no se puede deshacer.</p>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div class="button-group">
+            <button type="submit">Sí, eliminar</button>
+            <a href="{% url 'teaching_sequence' %}" class="button">Cancelar</a>
+        </div>
+    </form>
+</body>
+</html>
+

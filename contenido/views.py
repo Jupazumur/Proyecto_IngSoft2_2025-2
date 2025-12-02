@@ -233,3 +233,11 @@ def editar_cuestionario_desc(request, componente_id):
         "form": form,
         "cuestionario": cuestionario,
     })
+
+
+def eliminar_componente(request, componente_id):
+    componente = get_object_or_404(Componente, id=componente_id)
+    if request.method == 'POST':
+        componente.delete()
+        return redirect('teaching_sequence')
+    return render(request, 'contenido/eliminar_componente_confirmar.html', {'componente': componente})

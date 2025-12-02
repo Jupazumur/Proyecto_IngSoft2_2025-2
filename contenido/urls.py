@@ -6,6 +6,7 @@ urlpatterns = [
     path('', views.teaching_sequence, name='teaching_sequence'),
     path('actividad/nueva/', views.crear_actividad, name='crear_actividad'),
     path('actividad/<int:actividad_id>/editar/', views.editar_actividad, name='editar_actividad'),
+    path('actividad/<int:actividad_id>/eliminar/', views.eliminar_actividad, name='eliminar_actividad'),
     path('foro/<int:foro_id>/', views.foro_detalle, name='foro_detalle'),
     path('foro/<int:foro_id>/editar/', views.editar_foro, name='editar_foro'),
     path('examen/<int:componente_id>/editar-desc/', views.editar_examen_desc, name='editar_examen_desc'),

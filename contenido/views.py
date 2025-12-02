@@ -241,3 +241,11 @@ def eliminar_componente(request, componente_id):
         componente.delete()
         return redirect('teaching_sequence')
     return render(request, 'contenido/eliminar_componente_confirmar.html', {'componente': componente})
+
+
+def eliminar_actividad(request, actividad_id):
+    actividad = get_object_or_404(Actividad, id=actividad_id)
+    if request.method == 'POST':
+        actividad.delete()
+        return redirect('teaching_sequence')
+    return render(request, 'contenido/eliminar_actividad_confirmar.html', {'actividad': actividad})

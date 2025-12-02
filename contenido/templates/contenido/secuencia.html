@@ -103,7 +103,9 @@
         <a href="#">Participantes</a>
         <a href="#">Calificaciones</a>
         <a href="#">Competencias</a>
+        {% if user.is_staff %}
         <a href="{% url 'crear_actividad' %}" style="margin-left:20px;background:#005599;color:white;padding:6px 10px;border-radius:4px;text-decoration:none;">Nueva actividad</a>
+        {% endif %}
         <div class="dropdown">
             <a href="#">Más ▼</a>
             <div class="dropdown-content">
@@ -125,13 +127,13 @@
         {% for activity in activities %}
             <div class="activity" id="actividad{{ activity.id }}">
                 <h2>{{ activity.titulo }}</h2>
-
+                {% if user.is_staff %}
                 <div style="margin-bottom:10px;">
                     <a href="{% url 'agregar_componente' activity.id %}" style="font-size:0.9rem;">+ Añadir componente</a>
                     &nbsp;|&nbsp;
                     <a href="{% url 'editar_actividad' activity.id %}" style="font-size:0.9rem;">Editar actividad</a>
                 </div>
-
+                {% endif %}
                 <div class="descripcion">
                     {{ activity.descripcion|safe }}
                 </div>
@@ -140,31 +142,37 @@
                     <div class="component">
                         {% if comp.tipo == "foro" %}
                             <h3>Foro</h3>
+                            {% if user.is_staff %}
                             <p>{{ comp.titulo }}</p>
                             <div style="margin-top:6px;font-size:0.9rem;">
                                 <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
                                 <a href="{% url 'editar_foro' foro_id=comp.foro.id %}">Editar descripción</a>
                             </div>
+                            {% endif %}
                             {% if comp.foro %}
                                 <a href="{% url 'foro_detalle' comp.foro.id %}">Entrar al foro</a>
                             {% endif %}
                         {% elif comp.tipo == "examen" %}
                             <h3>Examen</h3>
                             <p>{{ comp.titulo }}</p>
+                            {% if user.is_staff %}
                             <div style="margin-top:6px;font-size:0.9rem;">
                                 <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
                                 <a href="{% url 'editar_examen_desc' comp.id %}">Editar descripción</a>
                             </div>
+                            {% endif %}
                             {% if comp.formulario %}
                                 <a href="{% url 'examen_detalle' comp.id %}">Entrar al examen</a>
                             {% endif %}
                         {% elif comp.tipo == "cuestionario" %}
                             <h3>Cuestionario</h3>
                             <p>{{ comp.titulo }}</p>
+                            {% if user.is_staff %}
                             <div style="margin-top:6px;font-size:0.9rem;">
                                 <a href="{% url 'editar_componente' comp.id %}">Editar componente</a>
                                 <a href="{% url 'editar_cuestionario_desc' comp.id %}">Editar descripción</a>
                             </div>
+                            {% endif %}
                             {% if comp.formulario %}
                                 <a href="{% url 'cuestionario_detalle' comp.id %}">Entrar al cuestionario</a>
                             {% endif %}

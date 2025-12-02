@@ -1,5 +1,5 @@
 from django import forms
-from .models import Actividad, Componente, Foro, Examen, Cuestionario
+from .models import Actividad, Componente, Foro, Examen, Cuestionario, BloqueApoyo
 
 
 class ActividadForm(forms.ModelForm):
@@ -28,3 +28,11 @@ class CuestionarioDescForm(forms.ModelForm):
     class Meta:
         model = Cuestionario
         fields = ["descripcion"]
+
+class BloqueApoyoForm(forms.ModelForm):
+    class Meta:
+        model = BloqueApoyo
+        fields = ['titulo', 'contenido'] # Solo dejamos editar esto
+        widgets = {
+            'titulo': forms.TextInput(attrs={'class': 'form-control'}),
+        }

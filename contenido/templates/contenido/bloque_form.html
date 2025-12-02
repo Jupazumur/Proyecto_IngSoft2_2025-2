@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Conceptos</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            margin: 0;
+            background-color: #f4f4f4; 
+        }
+
+        /* Header igual al de tu página principal para mantener estilo */
+        header { 
+            background: #003366; 
+            color: white; 
+            padding: 15px 20px; 
+            text-align: center;
+        }
+
+        .container { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 8px; 
+            max-width: 800px; 
+            margin: 40px auto; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+        }
+
+        h2 { 
+            color: #003366; 
+            margin-top: 0; 
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* Estilos para el formulario */
+        form p {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Para que el padding no rompa el ancho */
+        }
+
+        /* Botones */
+        .btn-guardar { 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .btn-guardar:hover { 
+            background: #218838; 
+        }
+
+        .btn-cancelar { 
+            text-decoration: none; 
+            color: #666; 
+            margin-left: 20px; 
+        }
+        .btn-cancelar:hover {
+            color: #333;
+            text-decoration: underline;
+        }
+        
+        /* Ajuste para que el editor CKEditor no se salga del contenedor */
+        .django-ckeditor-widget { 
+            width: 100% !important; 
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <strong>Plataforma Didáctica</strong> - Edición de Contenido
+    </header>
+
+    <div class="container">
+        <h2>✏️ Editar Conceptos Clave y Fórmulas</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            {{ form.media }}
+            
+            {{ form.as_p }}
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                <button type="submit" class="btn-guardar">💾 Guardar Cambios</button>
+                <a href="{% url 'teaching_sequence' %}" class="btn-cancelar">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

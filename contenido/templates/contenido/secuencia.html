@@ -105,6 +105,7 @@
         <a href="#">Competencias</a>
         {% if user.is_staff %}
         <a href="{% url 'crear_actividad' %}" style="margin-left:20px;background:#005599;color:white;padding:6px 10px;border-radius:4px;text-decoration:none;">Nueva actividad</a>
+        <a href="{% url 'lista_intentos' %}" style="margin-left:10px;background:#005599;color:white;padding:6px 10px;border-radius:4px;text-decoration:none;">Ver Intentos</a>
         {% endif %}
         <div class="dropdown">
             <a href="#">Más ▼</a>

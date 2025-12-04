@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'contenido',
     'formulario',
+    'intento',
     'django_ckeditor_5',
 ]
 

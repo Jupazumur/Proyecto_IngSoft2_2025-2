@@ -30,11 +30,12 @@ class Opcion(models.Model):
 		return self.texto
 
 class Respuesta(models.Model):
-	pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE)
+	pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE, related_name="respuestas")
 	opcion = models.ForeignKey(Opcion, null=True, blank=True, on_delete=models.SET_NULL)
 	texto = models.TextField(blank=True)
 	usuario = models.CharField(max_length=150, blank=True)
 	fecha = models.DateTimeField(auto_now_add=True)
+	intento = models.ForeignKey('intento.Intento', null=True, blank=True, on_delete=models.CASCADE, related_name="respuestas")
 
 	def __str__(self):
 		return f"Respuesta a '{self.pregunta.texto}'"

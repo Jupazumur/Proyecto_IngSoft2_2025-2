@@ -15,6 +15,14 @@ def examen_detalle(request, componente_id):
             mensaje = "Debes iniciar sesión para responder el examen."
         else:
             from formulario.models import Respuesta, Opcion
+            from intento.models import Intento
+            
+            # Crear un Intento para agrupar todas las respuestas
+            intento = Intento.objects.create(
+                usuario=request.user,
+                componente=componente
+            )
+
             for pregunta in preguntas:
                 key = f"pregunta_{pregunta.id}"
                 valor = request.POST.get(key)
@@ -23,7 +31,8 @@ def examen_detalle(request, componente_id):
                         Respuesta.objects.create(
                             pregunta=pregunta,
                             texto=valor,
-                            usuario=request.user.username
+                            usuario=request.user.username,
+                            intento=intento
                         )
                 elif pregunta.tipo == 'opcion_multiple':
                     if valor:
@@ -31,7 +40,8 @@ def examen_detalle(request, componente_id):
                         Respuesta.objects.create(
                             pregunta=pregunta,
                             opcion=opcion,
-                            usuario=request.user.username
+                            usuario=request.user.username,
+                            intento=intento
                         )
             mensaje = "Respuestas enviadas correctamente."
 
@@ -55,6 +65,14 @@ def cuestionario_detalle(request, componente_id):
             mensaje = "Debes iniciar sesión para responder el cuestionario."
         else:
             from formulario.models import Respuesta, Opcion
+            from intento.models import Intento
+            
+            # Crear un Intento para agrupar todas las respuestas
+            intento = Intento.objects.create(
+                usuario=request.user,
+                componente=componente
+            )
+
             for pregunta in preguntas:
                 key = f"pregunta_{pregunta.id}"
                 valor = request.POST.get(key)
@@ -63,7 +81,8 @@ def cuestionario_detalle(request, componente_id):
                         Respuesta.objects.create(
                             pregunta=pregunta,
                             texto=valor,
-                            usuario=request.user.username
+                            usuario=request.user.username,
+                            intento=intento
                         )
                 elif pregunta.tipo == 'opcion_multiple':
                     if valor:
@@ -71,7 +90,8 @@ def cuestionario_detalle(request, componente_id):
                         Respuesta.objects.create(
                             pregunta=pregunta,
                             opcion=opcion,
-                            usuario=request.user.username
+                            usuario=request.user.username,
+                            intento=intento
                         )
             mensaje = "Respuestas enviadas correctamente."
 

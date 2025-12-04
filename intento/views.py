@@ -10,7 +10,10 @@ def lista_intentos(request):
     """
     # Obtener todas las actividades con sus componentes e intentos
     actividades = Actividad.objects.prefetch_related(
-        'componentes__intentos__usuario'
+        'componentes__intentos__usuario',
+        'componentes__intentos__respuestas__pregunta',
+        'componentes__intentos__respuestas__opcion',
+        'componentes__formulario__preguntas__opciones'
     ).all()
     
     # Estructura de datos para el template
@@ -21,7 +24,10 @@ def lista_intentos(request):
         
         for componente in actividad.componentes.all():
             # Solo mostrar componentes que tienen intentos
-            intentos = componente.intentos.all()
+            intentos = componente.intentos.prefetch_related(
+                'respuestas__pregunta',
+                'respuestas__opcion'
+            ).all()
             
             if intentos.exists() or request.user.is_staff:
                 componentes_data.append({

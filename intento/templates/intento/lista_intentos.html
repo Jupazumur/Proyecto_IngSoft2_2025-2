@@ -71,6 +71,11 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .intento-header:hover {
+            opacity: 0.8;
         }
         .intento-usuario {
             font-weight: bold;
@@ -84,6 +89,67 @@
             color: #555;
             font-size: 0.9em;
             margin-top: 5px;
+        }
+        .expand-icon {
+            margin-left: 10px;
+            transition: transform 0.3s;
+            color: #005599;
+        }
+        .expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+        .intento-detalle {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .intento-detalle.show {
+            display: block;
+        }
+        .pregunta-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border-left: 3px solid #005599;
+        }
+        .pregunta-texto {
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+        .pregunta-tipo {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .respuesta-item {
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+        .respuesta-label {
+            font-weight: bold;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        .respuesta-texto {
+            color: #333;
+            padding: 8px;
+            background: #f0f0f0;
+            border-radius: 3px;
+        }
+        .sin-respuesta {
+            color: #999;
+            font-style: italic;
         }
         .no-intentos {
             color: #999;
@@ -110,6 +176,21 @@
             margin-top: 5px;
         }
     </style>
+    <script>
+        function toggleIntento(intentoId) {
+            const detalle = document.getElementById('detalle-' + intentoId);
+            const intentoItem = detalle.closest('.intento-item');
+            const icono = intentoItem.querySelector('.expand-icon');
+            
+            if (detalle.classList.contains('show')) {
+                detalle.classList.remove('show');
+                if (icono) icono.classList.remove('expanded');
+            } else {
+                detalle.classList.add('show');
+                if (icono) icono.classList.add('expanded');
+            }
+        }
+    </script>    
 </head>
 <body>
 
@@ -172,12 +253,68 @@
                                 {% if componente_item.intentos %}
                                     {% for intento in componente_item.intentos %}
                                         <div class="intento-item">
-                                            <div class="intento-header">
-                                                <span class="intento-usuario">{{ intento.usuario.username }}</span>
+                                            <div class="intento-header" onclick="toggleIntento({{ intento.id }})">
+                                                <div>
+                                                    <span class="intento-usuario">{{ intento.usuario.username }}</span>
+                                                    <span class="expand-icon">▶</span>
+                                                </div>
                                                 <span class="intento-fecha">{{ intento.fecha_creacion|date:"d/m/Y H:i" }}</span>
                                             </div>
                                             <div class="intento-info">
                                                 Última actualización: {{ intento.fecha_actualizacion|date:"d/m/Y H:i" }}
+                                            </div>
+                                            <div class="intento-detalle" id="detalle-{{ intento.id }}">
+                                                {% if componente_item.componente.formulario %}
+                                                    {% with formulario=componente_item.componente.formulario %}
+                                                        {% for pregunta in formulario.preguntas.all %}
+                                                            <div class="pregunta-item">
+                                                                <div class="pregunta-texto">
+                                                                    {{ forloop.counter }}. {{ pregunta.texto }}
+                                                                </div>
+                                                                <div class="pregunta-tipo">
+                                                                    {{ pregunta.get_tipo_display }}
+                                                                </div>
+                                                                <div class="respuesta-item">
+                                                                    <div class="respuesta-label">Respuesta:</div>
+                                                                    <div class="respuesta-texto">
+                                                                        {% for resp in intento.respuestas.all %}
+                                                                            {% if resp.pregunta.id == pregunta.id %}
+                                                                                {% if pregunta.tipo == 'abierta' %}
+                                                                                    {% if resp.texto %}
+                                                                                        {{ resp.texto|default:"Sin respuesta" }}
+                                                                                    {% else %}
+                                                                                        <span class="sin-respuesta">Sin respuesta</span>
+                                                                                    {% endif %}
+                                                                                {% elif pregunta.tipo == 'opcion_multiple' %}
+                                                                                    {% if resp.opcion %}
+                                                                                        {{ resp.opcion.texto }}
+                                                                                        {% if resp.opcion.correcta %}
+                                                                                            <span style="color: #4CAF50; margin-left: 10px; font-weight: bold;">✓ Correcta</span>
+                                                                                        {% else %}
+                                                                                            <span style="color: #f44336; margin-left: 10px; font-weight: bold;">✗ Incorrecta</span>
+                                                                                        {% endif %}
+                                                                                    {% else %}
+                                                                                        <span class="sin-respuesta">Sin respuesta</span>
+                                                                                    {% endif %}
+                                                                                {% endif %}
+                                                                            {% endif %}
+                                                                        {% empty %}
+                                                                            <span class="sin-respuesta">Sin respuesta</span>
+                                                                        {% endfor %}
+                                                                        {% comment %} Si no hay respuestas para esta pregunta, mostrar mensaje {% endcomment %}
+                                                                        {% if not intento.respuestas.all %}
+                                                                            <span class="sin-respuesta">Sin respuesta</span>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+                                                    {% endwith %}
+                                                {% else %}
+                                                    <p style="color: #999; font-style: italic; padding: 10px;">
+                                                        Este componente no tiene formulario asociado.
+                                                    </p>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -199,6 +336,20 @@
         </div>
     {% endif %}
 </div>
+
+</div>
+
+<script>
+    // Asegurar que todas las preguntas muestren algo, incluso si no hay respuesta
+    document.addEventListener('DOMContentLoaded', function() {
+        var respuestaTextos = document.querySelectorAll('.respuesta-texto');
+        respuestaTextos.forEach(function(respTexto) {
+            if (!respTexto.textContent.trim() || respTexto.textContent.trim() === '') {
+                respTexto.innerHTML = '<span class="sin-respuesta">Sin respuesta</span>';
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

@@ -1,0 +1,180 @@
+/* =========================================
+   ESTILOS GENERALES
+   ========================================= */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #eef2f5;
+    margin: 0;
+    padding: 0;
+}
+
+/* =========================================
+   ESTRUCTURA PRINCIPAL
+   ========================================= */
+header {
+    background: #003366;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header a, 
+header a:visited {
+    color: white !important;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.subheader {
+    background: #005599;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+}
+
+.subnav a,
+.subnav a:visited {
+    color: white;
+    margin-right: 20px;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.layout {
+    display: flex;
+    height: calc(100vh - 100px);
+}
+
+.sidebar {
+    width: 250px;
+    background: #f4f4f4;
+    height: 100%;
+    overflow-y: auto;
+    padding: 15px;
+    box-shadow: inset -1px 0 0 #ddd;
+    box-sizing: border-box;
+}
+
+.sidebar a, 
+.sidebar a:visited {
+    display: block;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: #003366;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.sidebar a:hover {
+    background-color: #e0e0e0;
+}
+
+.content {
+    flex: 1;
+    padding: 30px;
+    height: 100%;
+    overflow-y: auto;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+/* =========================================
+   LOGIN (Ajustado para centrarse solo él)
+   ========================================= */
+.login-container {
+    background-color: white;
+    width: 100%;
+    max-width: 400px;
+    margin: 80px auto; 
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid #003366;
+}
+
+.login-container h2 {
+    text-align: center;
+    color: #003366;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+}
+
+/* =========================================
+   FORMULARIOS Y BOTONES
+   ========================================= */
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
+.form-group input {
+    width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px;
+    font-size: 1rem; box-sizing: border-box; transition: border-color 0.3s;
+}
+.form-group input:focus { border-color: #005599; outline: none; }
+
+.btn-login {
+    width: 100%; padding: 12px; background-color: #003366; color: white;
+    border: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold;
+    cursor: pointer; transition: background-color 0.3s; margin-top: 10px;
+}
+.btn-login:hover { background-color: #002244; }
+
+.btn-volver {
+    display: inline-block; text-decoration: none; color: #666;
+    background-color: #f9f9f9; padding: 10px 20px; border-radius: 30px;
+    border: 1px solid #ddd; font-size: 0.9rem; transition: all 0.3s;
+}
+.btn-volver:hover {
+    background-color: #e0e0e0; color: #000; border-color: #bbb;
+    transform: translateY(-2px);
+}
+
+.login-container a { color: #005599; text-decoration: none; }
+.login-container a:hover { text-decoration: underline; }
+
+/* =========================================
+   ACTIVIDADES Y COMPONENTES
+   ========================================= */
+.activity { margin-bottom: 40px; border-bottom: 1px solid #ddd; padding-bottom: 20px; }
+.activity h2 { color: #003366; border-left: 5px solid #005599; padding-left: 10px; }
+
+.component {
+    background: #f0f4f8; padding: 15px; margin: 15px 0;
+    border-left: 4px solid #005599; border-radius: 4px;
+}
+.component h3 { margin-top: 0; color: #333; }
+
+/* =========================================
+   IMÁGENES
+   ========================================= */
+.descripcion img, .component img {
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    display: inline-block;
+    margin: 10px 0;
+}
+
+.image-style-align-left { float: left; margin-right: 15px; }
+.image-style-align-right { float: right; margin-left: 15px; }
+.image-style-align-center { margin: 0 auto; display: block; }
+.descripcion::after, .component::after { content: ""; display: table; clear: both; }
+
+/* =========================================
+   BOTÓN FLOTANTE (GLOSARIO)
+   ========================================= */
+.btn-conceptos-global {
+    position: fixed; bottom: 20px; right: 20px; background-color: #005599;
+    color: white; border: none; border-radius: 50px; padding: 12px 25px;
+    font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 9999; display: flex; align-items: center; gap: 10px; font-size: 1rem;
+    transition: transform 0.3s, background-color 0.3s;
+}
+.btn-conceptos-global:hover { background-color: #004488; transform: scale(1.05); }
+
+.caja-conceptos-global {
+    display: none; position: fixed; bottom: 80px; right: 20px; width: 350px;
+    max-height: 60vh; overflow-y: auto; background-color: white;
+    border: 1px solid #ccc; border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.25); z-index: 10000; padding: 20px;
+}

@@ -1,18 +1,75 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrarse</title>
+    <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
 </head>
 <body>
-    <h1>Crear cuenta</h1>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Registrarse</button>
-    </form>
+    <div class="login-container">
+        <h2>Crear Cuenta</h2>
 
-    <p><a href="{% url 'login' %}">¿Ya tienes cuenta? Inicia sesión</a></p>
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 0.9rem;">
+                    <strong>Por favor corrige los siguientes errores:</strong>
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="id_username">Nombre de usuario:</label>
+                {{ form.username }}
+                <small style="color: #666; font-size: 0.8rem;">
+                    * Obligatorio. Letras, dígitos y @/./+/-/_ solamente.
+                </small>
+                {% if form.username.errors %}
+                    <div style="color: red; font-size: 0.8rem;">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password1">Contraseña:</label>
+                {{ form.password1 }} <small style="color: #666; font-size: 0.8rem; display: block; margin-top: 5px;">
+                    * Tu contraseña no debe ser muy común.<br>
+                    * Debe contener al menos 8 caracteres.<br>
+                    * No debe ser solo numérica.
+                </small>
+                {% if form.password1.errors %}
+                    <div style="color: red; font-size: 0.8rem;">{{ form.password1.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password2">Confirmar contraseña:</label>
+                {{ form.password2 }}
+                <small style="color: #666; font-size: 0.8rem;">
+                    * Escribe la misma contraseña de nuevo.
+                </small>
+                {% if form.password2.errors %}
+                    <div style="color: red; font-size: 0.8rem;">{{ form.password2.errors }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-login">Registrarse</button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <p style="font-size: 0.9rem;">
+                <a href="{% url 'login' %}">¿Ya tienes cuenta? Inicia sesión</a>
+            </p>
+            
+            <br>
+            <a href="{% url 'teaching_sequence' %}" class="btn-volver">
+                ⬅ Volver a la Secuencia
+            </a>
+        </div>
+    </div>
+
 </body>
 </html>

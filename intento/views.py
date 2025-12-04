@@ -23,6 +23,10 @@ def lista_intentos(request):
         componentes_data = []
         
         for componente in actividad.componentes.all():
+            # Excluir componentes de tipo foro
+            if componente.tipo == 'foro':
+                continue
+                
             # Solo mostrar componentes que tienen intentos
             intentos = componente.intentos.prefetch_related(
                 'respuestas__pregunta',

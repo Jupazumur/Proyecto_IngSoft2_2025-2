@@ -81,7 +81,7 @@ header a:visited {
 }
 
 /* =========================================
-   LOGIN (Ajustado para centrarse solo él)
+   LOGIN
    ========================================= */
 .login-container {
     background-color: white;
@@ -101,9 +101,6 @@ header a:visited {
     font-size: 1.8rem;
 }
 
-/* =========================================
-   FORMULARIOS Y BOTONES
-   ========================================= */
 .form-group { margin-bottom: 20px; }
 .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
 .form-group input {
@@ -145,55 +142,64 @@ header a:visited {
 .component h3 { margin-top: 0; color: #333; }
 
 /* =========================================
-   IMÁGENES Y ALINEACIÓN (CORREGIDO)
+   IMÁGENES (CONFIGURACIÓN DEFINITIVA)
    ========================================= */
 
-/* 1. Regla base: Que no se salgan de la pantalla, pero respeten su tamaño */
+/* 1. Regla Básica: Responsiva pero respetando el tamaño manual del editor */
 .content img, 
 .descripcion img, 
 .component img,
-figure.image img {
-    max-width: 100%;       /* Responsivo: se encoge si la pantalla es chica */
-    height: auto;          /* Mantiene proporción */
-    width: auto;           /* Usa el tamaño real de la imagen, no la estira */
+figure.image img,
+main img {
+    max-width: 100%;       /* Para que no se salga del celular */
+    height: auto !important; /* Mantiene la proporción siempre */
+    /* QUITAMOS 'width: auto !important' para que el editor pueda cambiar el tamaño */
 }
 
-/* 2. El contenedor de la imagen (CKEditor usa <figure>) */
+/* 2. Contenedor de la figura (CKEditor) */
 figure.image {
-    display: table;        /* Se ajusta al ancho de la imagen */
-    margin: 10px auto;     /* Centrado por defecto */
-    clear: both;           /* Limpia el espacio */
+    display: table;
+    clear: both;
+    text-align: center;
+    margin: 10px auto; /* Centrado por defecto */
 }
 
 /* 3. ALINEACIÓN IZQUIERDA */
-.image-style-align-left {
-    float: left;           /* Flota a la izquierda */
-    margin-right: 20px;    /* Espacio para que el texto no se pegue */
-    margin-bottom: 10px;
-    clear: none;           /* Permite que el texto suba a su lado */
+.image-style-align-left,
+figure.image.image-style-align-left {
+    float: left;
+    margin-right: 20px;
+    margin-bottom: 15px;
 }
 
 /* 4. ALINEACIÓN DERECHA */
-.image-style-align-right {
-    float: right;          /* Flota a la derecha */
-    margin-left: 20px;     /* Espacio a la izquierda */
-    margin-bottom: 10px;
-    clear: none;           /* Permite que el texto suba a su lado */
+.image-style-align-right,
+figure.image.image-style-align-right {
+    float: right;
+    margin-left: 20px;
+    margin-bottom: 15px;
 }
 
 /* 5. ALINEACIÓN CENTRO */
-.image-style-align-center {
+.image-style-align-center,
+figure.image.image-style-align-center {
     margin-left: auto;
     margin-right: auto;
-    display: table;        /* Necesario para centrar figuras */
-    clear: both;           /* El texto NO sube, se queda arriba/abajo */
+    display: table;
+    float: none;
+    clear: both;
 }
 
-/* Corrección para que las cajas no colapsen si la imagen es muy alta */
-.descripcion::after, .component::after {
-    content: "";
-    display: table;
-    clear: both;
+/* 6. LA BARRERA (VITAL): Obliga a lo siguiente a irse abajo */
+.content h3, 
+.content h4, 
+.content form,
+.comentarios-section,
+hr {
+    clear: both !important; /* Prohíbe que suban al lado de la imagen */
+    display: block;
+    width: 100%;
+    margin-top: 30px; /* Espacio separador */
 }
 
 /* =========================================

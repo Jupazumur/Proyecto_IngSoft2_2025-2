@@ -99,11 +99,13 @@ Sigue estos pasos para ejecutar el proyecto en tu entorno local:
 Proyecto desarrollado para la materia de Ingeniería de Software II.
 
 Integrantes:
-Arce Jáuregui Gerardo Antonio
-Duarte Rodríguez Melissa
-Gutiérrez León Andrés
-Ruiz Ruiz Óscar Iván
-Zurita Murillo Juan Pablo
+<p>
+   Arce Jáuregui Gerardo Antonio<br>
+   Duarte Rodríguez Melissa<br>
+   Gutiérrez León Andrés<br>
+   Ruiz Ruiz Óscar Iván<br>
+   Zurita Murillo Juan Pablo
+</p>
 
 **Herramientas de Asistencia:**
 * El desarrollo contó con la asistencia de **Gemini** y **ChatGPT** para la optimización de código, corrección de bugs y generación de *snippets* de Django/HTML.

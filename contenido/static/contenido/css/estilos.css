@@ -161,6 +161,27 @@ figure.image {
     clear: both;
     text-align: center;
     margin: 10px auto; /* Centrado por defecto */
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Contenedor de descripción - previene overflow de imágenes */
+.descripcion {
+    overflow-x: hidden; /* Previene scrollbars horizontales no deseados */
+    overflow-y: visible;
+    word-wrap: break-word;
+}
+
+/* Asegura que las figuras con imágenes no excedan el ancho del contenedor */
+.descripcion figure.image {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.descripcion figure.image img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* 3. ALINEACIÓN IZQUIERDA */
@@ -169,6 +190,16 @@ figure.image.image-style-align-left {
     float: left;
     margin-right: 20px;
     margin-bottom: 15px;
+    max-width: 60%; /* Limita el ancho para que no ocupe todo el espacio */
+    width: auto;
+    box-sizing: border-box;
+}
+
+.image-style-align-left img,
+figure.image.image-style-align-left img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* 4. ALINEACIÓN DERECHA */
@@ -177,6 +208,16 @@ figure.image.image-style-align-right {
     float: right;
     margin-left: 20px;
     margin-bottom: 15px;
+    max-width: 60%; /* Limita el ancho para que no ocupe todo el espacio */
+    width: auto;
+    box-sizing: border-box;
+}
+
+.image-style-align-right img,
+figure.image.image-style-align-right img {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* 5. ALINEACIÓN CENTRO */

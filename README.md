@@ -16,7 +16,7 @@ El sistema gestiona una secuencia didáctica interactiva donde los estudiantes p
 * **Formularios:** Para la recolección de datos dentro de la secuencia.
 * **Foros de Discusión:** Espacios dedicados para que los alumnos participen, debatan y resuelvan dudas sobre los temas vistos.
 
-### 3. 🆕 Glosario Global Flotante
+### 3. Glosario Global Flotante
 * **Acceso Universal:** Un botón flotante ("Recursos") disponible en todas las vistas del sitio (Inicio, Exámenes, Foros).
 * **Contenido Persistente:** Muestra definiciones clave, fórmulas y recursos de apoyo que acompañan al alumno durante toda la navegación.
 * **Gestión Centralizada:** El contenido es único para todo el curso y solo puede ser modificado por el tutor.
@@ -64,6 +64,7 @@ Sigue estos pasos para ejecutar el proyecto en tu entorno local:
 
 4.  **Aplicar migraciones:**
     ```bash
+    python manage.py makemigrations
     python manage.py migrate
     ```
 
@@ -88,9 +89,21 @@ Sigue estos pasos para ejecutar el proyecto en tu entorno local:
 2.  **Para ver como alumno:** Cierra sesión o abre una ventana de incógnito. Los botones de edición desaparecerán, pero podrás interactuar con los foros y exámenes.
 
 ---
+## 🖊️ Plan de Trabajo
+
+[Nuestro Plan de Trabajo](https://docs.google.com/document/d/1Jgf7Fp89_p4p07cVvl7bYbo18Pu2iBOh7DMRI65HVU8/edit?usp=sharing)
+
+---
 
 ## 👥 Créditos
 Proyecto desarrollado para la materia de Ingeniería de Software II.
+
+Integrantes:
+Arce Jáuregui Gerardo Antonio
+Duarte Rodríguez Melissa
+Gutiérrez León Andrés
+Ruiz Ruiz Óscar Iván
+Zurita Murillo Juan Pablo
 
 **Herramientas de Asistencia:**
 * El desarrollo contó con la asistencia de **Gemini** y **ChatGPT** para la optimización de código, corrección de bugs y generación de *snippets* de Django/HTML.

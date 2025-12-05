@@ -145,20 +145,56 @@ header a:visited {
 .component h3 { margin-top: 0; color: #333; }
 
 /* =========================================
-   IMÁGENES
+   IMÁGENES Y ALINEACIÓN (CORREGIDO)
    ========================================= */
-.descripcion img, .component img {
-    max-width: 100%;
-    width: auto;
-    height: auto;
-    display: inline-block;
-    margin: 10px 0;
+
+/* 1. Regla base: Que no se salgan de la pantalla, pero respeten su tamaño */
+.content img, 
+.descripcion img, 
+.component img,
+figure.image img {
+    max-width: 100%;       /* Responsivo: se encoge si la pantalla es chica */
+    height: auto;          /* Mantiene proporción */
+    width: auto;           /* Usa el tamaño real de la imagen, no la estira */
 }
 
-.image-style-align-left { float: left; margin-right: 15px; }
-.image-style-align-right { float: right; margin-left: 15px; }
-.image-style-align-center { margin: 0 auto; display: block; }
-.descripcion::after, .component::after { content: ""; display: table; clear: both; }
+/* 2. El contenedor de la imagen (CKEditor usa <figure>) */
+figure.image {
+    display: table;        /* Se ajusta al ancho de la imagen */
+    margin: 10px auto;     /* Centrado por defecto */
+    clear: both;           /* Limpia el espacio */
+}
+
+/* 3. ALINEACIÓN IZQUIERDA */
+.image-style-align-left {
+    float: left;           /* Flota a la izquierda */
+    margin-right: 20px;    /* Espacio para que el texto no se pegue */
+    margin-bottom: 10px;
+    clear: none;           /* Permite que el texto suba a su lado */
+}
+
+/* 4. ALINEACIÓN DERECHA */
+.image-style-align-right {
+    float: right;          /* Flota a la derecha */
+    margin-left: 20px;     /* Espacio a la izquierda */
+    margin-bottom: 10px;
+    clear: none;           /* Permite que el texto suba a su lado */
+}
+
+/* 5. ALINEACIÓN CENTRO */
+.image-style-align-center {
+    margin-left: auto;
+    margin-right: auto;
+    display: table;        /* Necesario para centrar figuras */
+    clear: both;           /* El texto NO sube, se queda arriba/abajo */
+}
+
+/* Corrección para que las cajas no colapsen si la imagen es muy alta */
+.descripcion::after, .component::after {
+    content: "";
+    display: table;
+    clear: both;
+}
 
 /* =========================================
    BOTÓN FLOTANTE (GLOSARIO)

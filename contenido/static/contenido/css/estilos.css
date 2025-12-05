@@ -392,3 +392,98 @@ hr {
 .btn-azul-small:hover { background-color: #003366; }
 
 .errorlist { color: red; list-style: none; padding: 0; font-size: 0.9rem; }
+
+/* =========================================
+   LISTA DE INTENTOS
+   ========================================= */
+   .activity-title {
+    font-size: 1.5em;
+    color: #003366;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #005599;
+}
+
+.component-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.component-title {
+    font-size: 1.2em;
+    color: #003366;
+    font-weight: bold;
+}
+
+.component-type {
+    background: #005599;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    text-transform: capitalize;
+    margin-left: 10px;
+}
+
+.intento-item {
+    background: white;
+    padding: 12px;
+    margin: 8px 0;
+    border-left: 3px solid #4CAF50; /* Borde verde para diferenciar */
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.intento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+.intento-header:hover { opacity: 0.8; }
+
+.intento-usuario { font-weight: bold; color: #003366; }
+.intento-fecha { color: #666; font-size: 0.9em; }
+
+.expand-icon {
+    margin-left: 10px;
+    transition: transform 0.3s;
+    color: #005599;
+}
+.expand-icon.expanded { transform: rotate(90deg); }
+
+.intento-detalle {
+    display: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+.intento-detalle.show { display: block; }
+
+/* Preguntas y Respuestas dentro del intento */
+.pregunta-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    border-left: 3px solid #005599;
+}
+.pregunta-texto { font-weight: bold; color: #003366; margin-bottom: 10px; }
+.respuesta-item { padding: 10px; background: white; border-radius: 4px; margin-top: 8px; }
+.respuesta-label { font-weight: bold; color: #666; font-size: 0.9em; }
+.respuesta-texto { color: #333; padding: 8px; background: #f0f0f0; border-radius: 3px; }
+.sin-respuesta, .no-intentos { color: #999; font-style: italic; }
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #005599;
+    text-decoration: none;
+    padding: 8px 15px;
+    border: 1px solid #005599;
+    border-radius: 4px;
+}
+.back-link:hover { background: #005599; color: white; }

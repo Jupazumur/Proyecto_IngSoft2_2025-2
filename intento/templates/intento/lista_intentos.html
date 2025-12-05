@@ -3,179 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista de Intentos</title>
-    <style>
-        body { margin: 0; font-family: sans-serif; }
-        header { background: #003366; color: white; padding: 10px 20px; }
-        .navbar a { color: white; margin-right: 15px; text-decoration: none; }
-        .subheader { background: #005599; padding: 10px 20px; display: flex; align-items: center; }
-        .subnav a { color: white; margin-right: 20px; text-decoration: none; }
-        .content {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .activity {
-            margin-bottom: 40px;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 30px;
-        }
-        .activity:last-child {
-            border-bottom: none;
-        }
-        .activity-title {
-            font-size: 1.5em;
-            color: #003366;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #005599;
-        }
-        .component {
-            background: #eef1f7;
-            padding: 15px;
-            margin: 15px 0;
-            border-left: 4px solid #005599;
-            border-radius: 4px;
-        }
-        .component-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .component-title {
-            font-size: 1.2em;
-            color: #003366;
-            font-weight: bold;
-        }
-        .component-type {
-            background: #005599;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            text-transform: capitalize;
-        }
-        .intentos-list {
-            margin-top: 15px;
-        }
-        .intento-item {
-            background: white;
-            padding: 12px;
-            margin: 8px 0;
-            border-left: 3px solid #4CAF50;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .intento-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            cursor: pointer;
-            user-select: none;
-        }
-        .intento-header:hover {
-            opacity: 0.8;
-        }
-        .intento-usuario {
-            font-weight: bold;
-            color: #003366;
-        }
-        .intento-fecha {
-            color: #666;
-            font-size: 0.9em;
-        }
-        .intento-info {
-            color: #555;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-        .expand-icon {
-            margin-left: 10px;
-            transition: transform 0.3s;
-            color: #005599;
-        }
-        .expand-icon.expanded {
-            transform: rotate(90deg);
-        }
-        .intento-detalle {
-            display: none;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #ddd;
-        }
-        .intento-detalle.show {
-            display: block;
-        }
-        .pregunta-item {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 4px;
-            border-left: 3px solid #005599;
-        }
-        .pregunta-texto {
-            font-weight: bold;
-            color: #003366;
-            margin-bottom: 10px;
-            font-size: 1.05em;
-        }
-        .pregunta-tipo {
-            display: inline-block;
-            background: #e0e0e0;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 0.85em;
-            color: #555;
-            margin-bottom: 10px;
-        }
-        .respuesta-item {
-            padding: 10px;
-            background: white;
-            border-radius: 4px;
-            margin-top: 8px;
-        }
-        .respuesta-label {
-            font-weight: bold;
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-        .respuesta-texto {
-            color: #333;
-            padding: 8px;
-            background: #f0f0f0;
-            border-radius: 3px;
-        }
-        .sin-respuesta {
-            color: #999;
-            font-style: italic;
-        }
-        .no-intentos {
-            color: #999;
-            font-style: italic;
-            padding: 10px;
-            text-align: center;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #005599;
-            text-decoration: none;
-            padding: 8px 15px;
-            border: 1px solid #005599;
-            border-radius: 4px;
-        }
-        .back-link:hover {
-            background: #005599;
-            color: white;
-        }
-        .stats {
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-    </style>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
+
     <script>
         function toggleIntento(intentoId) {
             const detalle = document.getElementById('detalle-' + intentoId);
@@ -201,18 +32,19 @@
         <a href="#">Cursos</a>
         <a href="#">Ayuda</a>
     </div>
-    <div style="float: right;">
+
+    <div>
         {% if user.is_authenticated %}
             {{ user.username }} |
             <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: inline;">
                 {% csrf_token %}
-                <button type="submit" style="background:none;border:none;color:white;cursor:pointer;">
+                <button type="submit" style="background:none;border:none;color:white;cursor:pointer;font-weight:bold;">
                     Cerrar sesión
                 </button>
             </form>
         {% else %}
             <a href="{% url 'register' %}">Registrarse</a> |
-            <a href="{% url 'login' %}?next={{ request.path }}">Iniciar sesión</a>
+            <a href="{% url 'login' %}">Iniciar sesión</a>
         {% endif %}
     </div>
 </header>
@@ -263,6 +95,7 @@
                                             <div class="intento-info">
                                                 Última actualización: {{ intento.fecha_actualizacion|date:"d/m/Y H:i" }}
                                             </div>
+                                            
                                             <div class="intento-detalle" id="detalle-{{ intento.id }}">
                                                 {% if componente_item.componente.formulario %}
                                                     {% with formulario=componente_item.componente.formulario %}
@@ -301,7 +134,7 @@
                                                                         {% empty %}
                                                                             <span class="sin-respuesta">Sin respuesta</span>
                                                                         {% endfor %}
-                                                                        {% comment %} Si no hay respuestas para esta pregunta, mostrar mensaje {% endcomment %}
+                                                                        
                                                                         {% if not intento.respuestas.all %}
                                                                             <span class="sin-respuesta">Sin respuesta</span>
                                                                         {% endif %}
@@ -336,20 +169,6 @@
         </div>
     {% endif %}
 </div>
-
-</div>
-
-<script>
-    // Asegurar que todas las preguntas muestren algo, incluso si no hay respuesta
-    document.addEventListener('DOMContentLoaded', function() {
-        var respuestaTextos = document.querySelectorAll('.respuesta-texto');
-        respuestaTextos.forEach(function(respTexto) {
-            if (!respTexto.textContent.trim() || respTexto.textContent.trim() === '') {
-                respTexto.innerHTML = '<span class="sin-respuesta">Sin respuesta</span>';
-            }
-        });
-    });
-</script>
 
 </body>
 </html>

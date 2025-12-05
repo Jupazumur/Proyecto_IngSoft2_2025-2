@@ -1,18 +1,46 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar sesión</title>
+    <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
 </head>
 <body>
-    <h1>Iniciar sesión</h1>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Entrar</button>
-    </form>
+    <div class="login-container">
+        <h2>Bienvenido</h2>
 
-    <p><a href="{% url 'register' %}">Crear una cuenta</a></p>
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <p style="color: red; text-align: center; margin-bottom: 15px;">Usuario o contraseña incorrectos.</p>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="id_username">Usuario:</label>
+                {{ form.username }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password">Contraseña:</label>
+                {{ form.password }}
+            </div>
+
+            <button type="submit" class="btn-login">Ingresar</button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <p><a href="{% url 'register' %}">¿No tienes cuenta? Regístrate</a></p>
+            
+            <br>
+            <a href="{% url 'teaching_sequence' %}" class="btn-volver">
+                ⬅ Volver a la Secuencia
+            </a>
+        </div>
+    </div>
+
 </body>
 </html>

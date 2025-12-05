@@ -25,6 +25,7 @@ urlpatterns = [
     path("ckeditor5/", include('django_ckeditor_5.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('formulario/', include('formulario.urls')),
+    path('intento/', include('intento.urls')),
     path('', include('contenido.urls')),   
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

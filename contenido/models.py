@@ -147,3 +147,20 @@ def borrar_formulario_al_borrar_componente(sender, instance, **kwargs):
         otros_componentes = Componente.objects.filter(formulario=instance.formulario).exclude(id=instance.id)
         if not otros_componentes.exists():
             instance.formulario.delete()
+
+class BloqueApoyo(models.Model):
+    actividad = models.ForeignKey(Actividad, related_name="bloque_apoyo", on_delete=models.CASCADE)
+    
+    titulo = models.CharField(max_length=200, default="Conceptos Importantes")
+    
+    contenido = CKEditor5Field('Contenido', config_name='extends', blank=True)
+
+    def __str__(self):
+        return f"Apoyo para: {self.actividad.titulo}"
+    
+class GlosarioGlobal(models.Model):
+    titulo = models.CharField(max_length=200, default="Recursos del Curso")
+    contenido = CKEditor5Field('Contenido', config_name='extends', blank=True)
+
+    def __str__(self):
+        return "Glosario Universal"

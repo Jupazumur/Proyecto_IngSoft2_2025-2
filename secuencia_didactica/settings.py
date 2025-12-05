@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'contenido',
     'formulario',
+    'intento',
     'django_ckeditor_5',
 ]
 
@@ -78,6 +79,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'contenido.context_processors.glosario_global',
             ],
         },
     },

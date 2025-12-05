@@ -17,4 +17,5 @@ urlpatterns = [
     path('componente/<int:componente_id>/editar/', views.editar_componente, name='editar_componente'),
     path('componente/<int:componente_id>/eliminar/', views.eliminar_componente, name='eliminar_componente'),
     path('register/', views.register, name='register'),
+    path('glosario/editar/', views.editar_glosario_global, name='editar_glosario_global'),
 ]

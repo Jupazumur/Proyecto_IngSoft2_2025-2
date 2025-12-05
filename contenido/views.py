@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Actividad, Foro, Comentario, Componente, Examen, Cuestionario
+from .models import Actividad, Foro, Comentario, Componente, Examen, Cuestionario, BloqueApoyo, GlosarioGlobal
 from formulario.models import Formulario
-from .forms import ActividadForm, ComponenteForm, ForoForm, ExamenDescForm, CuestionarioDescForm
+from .forms import ActividadForm, ComponenteForm, ForoForm, ExamenDescForm, CuestionarioDescForm, BloqueApoyoForm
 
 def examen_detalle(request, componente_id):
     componente = get_object_or_404(Componente, id=componente_id, tipo="examen")
@@ -15,6 +15,14 @@ def examen_detalle(request, componente_id):
             mensaje = "Debes iniciar sesión para responder el examen."
         else:
             from formulario.models import Respuesta, Opcion
+            from intento.models import Intento
+            
+            # Crear un Intento para agrupar todas las respuestas
+            intento = Intento.objects.create(
+                usuario=request.user,
+                componente=componente
+            )
+
             for pregunta in preguntas:
                 key = f"pregunta_{pregunta.id}"
                 valor = request.POST.get(key)
@@ -23,7 +31,8 @@ def examen_detalle(request, componente_id):
                         Respuesta.objects.create(
                             pregunta=pregunta,
                             texto=valor,
-                            usuario=request.user.username
+                            usuario=request.user.username,
+                            intento=intento
                         )
                 elif pregunta.tipo == 'opcion_multiple':
                     if valor:
@@ -31,7 +40,8 @@ def examen_detalle(request, componente_id):
                         Respuesta.objects.create(
                             pregunta=pregunta,
                             opcion=opcion,
-                            usuario=request.user.username
+                            usuario=request.user.username,
+                            intento=intento
                         )
             mensaje = "Respuestas enviadas correctamente."
 
@@ -55,6 +65,14 @@ def cuestionario_detalle(request, componente_id):
             mensaje = "Debes iniciar sesión para responder el cuestionario."
         else:
             from formulario.models import Respuesta, Opcion
+            from intento.models import Intento
+            
+            # Crear un Intento para agrupar todas las respuestas
+            intento = Intento.objects.create(
+                usuario=request.user,
+                componente=componente
+            )
+
             for pregunta in preguntas:
                 key = f"pregunta_{pregunta.id}"
                 valor = request.POST.get(key)
@@ -63,7 +81,8 @@ def cuestionario_detalle(request, componente_id):
                         Respuesta.objects.create(
                             pregunta=pregunta,
                             texto=valor,
-                            usuario=request.user.username
+                            usuario=request.user.username,
+                            intento=intento
                         )
                 elif pregunta.tipo == 'opcion_multiple':
                     if valor:
@@ -71,7 +90,8 @@ def cuestionario_detalle(request, componente_id):
                         Respuesta.objects.create(
                             pregunta=pregunta,
                             opcion=opcion,
-                            usuario=request.user.username
+                            usuario=request.user.username,
+                            intento=intento
                         )
             mensaje = "Respuestas enviadas correctamente."
 
@@ -249,3 +269,23 @@ def eliminar_actividad(request, actividad_id):
         actividad.delete()
         return redirect('teaching_sequence')
     return render(request, 'contenido/eliminar_actividad_confirmar.html', {'actividad': actividad})
+
+def editar_glosario_global(request):
+    glosario = GlosarioGlobal.objects.last()
+    
+    # Si no existe, lo crea al vuelo
+    if not glosario:
+        glosario = GlosarioGlobal.objects.create(titulo="Recursos del Curso", contenido="")
+
+    if not request.user.is_staff:
+        return redirect('teaching_sequence')
+
+    if request.method == 'POST':
+        form = BloqueApoyoForm(request.POST, instance=glosario)
+        if form.is_valid():
+            form.save()
+            return redirect('teaching_sequence')
+    else:
+        form = BloqueApoyoForm(instance=glosario)
+
+    return render(request, 'contenido/bloque_form.html', {'form': form})

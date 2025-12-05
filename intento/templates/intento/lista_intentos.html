@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Intentos</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
+
+    <script>
+        function toggleIntento(intentoId) {
+            const detalle = document.getElementById('detalle-' + intentoId);
+            const intentoItem = detalle.closest('.intento-item');
+            const icono = intentoItem.querySelector('.expand-icon');
+            
+            if (detalle.classList.contains('show')) {
+                detalle.classList.remove('show');
+                if (icono) icono.classList.remove('expanded');
+            } else {
+                detalle.classList.add('show');
+                if (icono) icono.classList.add('expanded');
+            }
+        }
+    </script>    
+</head>
+<body>
+
+<header>
+    <div class="navbar">
+        <strong>Plataforma</strong>
+        <a href="{% url 'teaching_sequence' %}">Inicio</a>
+        <a href="#">Cursos</a>
+        <a href="#">Ayuda</a>
+    </div>
+
+    <div>
+        {% if user.is_authenticated %}
+            {{ user.username }} |
+            <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" style="background:none;border:none;color:white;cursor:pointer;font-weight:bold;">
+                    Cerrar sesión
+                </button>
+            </form>
+        {% else %}
+            <a href="{% url 'register' %}">Registrarse</a> |
+            <a href="{% url 'login' %}">Iniciar sesión</a>
+        {% endif %}
+    </div>
+</header>
+
+<div class="subheader">
+    <div class="subnav">
+        <a href="{% url 'teaching_sequence' %}">Curso</a>
+        <a href="#">Participantes</a>
+        <a href="{% url 'lista_intentos' %}">Intentos</a>
+        <a href="#">Competencias</a>
+    </div>
+</div>
+
+<div class="content">
+    <a href="{% url 'teaching_sequence' %}" class="back-link">← Volver a la secuencia didáctica</a>
+    
+    <h1 style="color: #003366; margin-bottom: 30px;">Lista de Intentos</h1>
+    
+    {% if actividades_data %}
+        {% for actividad_item in actividades_data %}
+            <div class="activity">
+                <h2 class="activity-title">{{ actividad_item.actividad.titulo }}</h2>
+                
+                {% if actividad_item.componentes %}
+                    {% for componente_item in actividad_item.componentes %}
+                        <div class="component">
+                            <div class="component-header">
+                                <div>
+                                    <span class="component-title">{{ componente_item.componente.titulo|default:"Sin título" }}</span>
+                                    <span class="component-type">{{ componente_item.componente.get_tipo_display }}</span>
+                                </div>
+                                <div class="stats">
+                                    Total de intentos: {{ componente_item.total_intentos }}
+                                </div>
+                            </div>
+                            
+                            <div class="intentos-list">
+                                {% if componente_item.intentos %}
+                                    {% for intento in componente_item.intentos %}
+                                        <div class="intento-item">
+                                            <div class="intento-header" onclick="toggleIntento({{ intento.id }})">
+                                                <div>
+                                                    <span class="intento-usuario">{{ intento.usuario.username }}</span>
+                                                    <span class="expand-icon">▶</span>
+                                                </div>
+                                                <span class="intento-fecha">{{ intento.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                                            </div>
+                                            <div class="intento-info">
+                                                Última actualización: {{ intento.fecha_actualizacion|date:"d/m/Y H:i" }}
+                                            </div>
+                                            
+                                            <div class="intento-detalle" id="detalle-{{ intento.id }}">
+                                                {% if componente_item.componente.formulario %}
+                                                    {% with formulario=componente_item.componente.formulario %}
+                                                        {% for pregunta in formulario.preguntas.all %}
+                                                            <div class="pregunta-item">
+                                                                <div class="pregunta-texto">
+                                                                    {{ forloop.counter }}. {{ pregunta.texto }}
+                                                                </div>
+                                                                <div class="pregunta-tipo">
+                                                                    {{ pregunta.get_tipo_display }}
+                                                                </div>
+                                                                <div class="respuesta-item">
+                                                                    <div class="respuesta-label">Respuesta:</div>
+                                                                    <div class="respuesta-texto">
+                                                                        {% for resp in intento.respuestas.all %}
+                                                                            {% if resp.pregunta.id == pregunta.id %}
+                                                                                {% if pregunta.tipo == 'abierta' %}
+                                                                                    {% if resp.texto %}
+                                                                                        {{ resp.texto|default:"Sin respuesta" }}
+                                                                                    {% else %}
+                                                                                        <span class="sin-respuesta">Sin respuesta</span>
+                                                                                    {% endif %}
+                                                                                {% elif pregunta.tipo == 'opcion_multiple' %}
+                                                                                    {% if resp.opcion %}
+                                                                                        {{ resp.opcion.texto }}
+                                                                                        {% if resp.opcion.correcta %}
+                                                                                            <span style="color: #4CAF50; margin-left: 10px; font-weight: bold;">✓ Correcta</span>
+                                                                                        {% else %}
+                                                                                            <span style="color: #f44336; margin-left: 10px; font-weight: bold;">✗ Incorrecta</span>
+                                                                                        {% endif %}
+                                                                                    {% else %}
+                                                                                        <span class="sin-respuesta">Sin respuesta</span>
+                                                                                    {% endif %}
+                                                                                {% endif %}
+                                                                            {% endif %}
+                                                                        {% empty %}
+                                                                            <span class="sin-respuesta">Sin respuesta</span>
+                                                                        {% endfor %}
+                                                                        
+                                                                        {% if not intento.respuestas.all %}
+                                                                            <span class="sin-respuesta">Sin respuesta</span>
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+                                                    {% endwith %}
+                                                {% else %}
+                                                    <p style="color: #999; font-style: italic; padding: 10px;">
+                                                        Este componente no tiene formulario asociado.
+                                                    </p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="no-intentos">No hay intentos registrados para este componente.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: #999; font-style: italic;">Esta actividad no tiene componentes con intentos.</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div style="text-align: center; padding: 40px; color: #999;">
+            <p style="font-size: 1.2em;">No hay intentos registrados aún.</p>
+            <p>Los intentos aparecerán aquí cuando los usuarios respondan exámenes o cuestionarios.</p>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

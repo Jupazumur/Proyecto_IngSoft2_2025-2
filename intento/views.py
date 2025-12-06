@@ -26,17 +26,40 @@ def lista_intentos(request):
             # Excluir componentes de tipo foro
             if componente.tipo == 'foro':
                 continue
-                
+
             # Solo mostrar componentes que tienen intentos
             intentos = componente.intentos.prefetch_related(
                 'respuestas__pregunta',
-                'respuestas__opcion'
+                'respuestas__opcion',
+                'usuario'
             ).all()
-            
+
+            # Agrupar intentos por usuario
+            usuarios_intentos = {}
+            for intento in intentos:
+                usuario_id = intento.usuario.id
+                if usuario_id not in usuarios_intentos:
+                    usuarios_intentos[usuario_id] = {
+                        'usuario': intento.usuario,
+                        'intentos': [],
+                        'total_intentos': 0,
+                        'ultimo_intento': None
+                    }
+                usuarios_intentos[usuario_id]['intentos'].append(intento)
+                usuarios_intentos[usuario_id]['total_intentos'] += 1
+                # Mantener el intento más reciente
+                if (usuarios_intentos[usuario_id]['ultimo_intento'] is None or
+                    intento.fecha_creacion > usuarios_intentos[usuario_id]['ultimo_intento'].fecha_creacion):
+                    usuarios_intentos[usuario_id]['ultimo_intento'] = intento
+
+            # Convertir a lista ordenada por fecha del último intento (más reciente primero)
+            usuarios_data = list(usuarios_intentos.values())
+            usuarios_data.sort(key=lambda x: x['ultimo_intento'].fecha_creacion if x['ultimo_intento'] else x['intentos'][0].fecha_creacion, reverse=True)
+
             if intentos.exists() or request.user.is_staff:
                 componentes_data.append({
                     'componente': componente,
-                    'intentos': intentos,
+                    'usuarios_intentos': usuarios_data,
                     'total_intentos': intentos.count()
                 })
         

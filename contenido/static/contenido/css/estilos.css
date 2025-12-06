@@ -487,3 +487,96 @@ hr {
     border-radius: 4px;
 }
 .back-link:hover { background: #005599; color: white; }
+
+/* =========================================
+   AGRUPACIÓN POR USUARIO EN LISTA DE INTENTOS
+   ========================================= */
+
+.usuarios-list {
+    margin-top: 15px;
+}
+
+.usuario-item {
+    background: #f8f9fa;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+}
+
+.usuario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #005599;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+}
+.usuario-header:hover { background: #004488; }
+
+.usuario-nombre {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.intentos-count {
+    color: #e0e0e0;
+    font-size: 0.9em;
+    margin-left: 10px;
+}
+
+.ultimo-intento {
+    color: #e0e0e0;
+    font-size: 0.9em;
+}
+
+.usuario-intentos {
+    display: none;
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #e9ecef;
+}
+.usuario-intentos.show { display: block; }
+
+/* Estilos para los intentos individuales dentro de cada usuario */
+.usuario-intentos .intento-item {
+    background: #f8f9fa;
+    border-left: 3px solid #17a2b8; /* Borde cyan para diferenciar de los intentos individuales */
+    margin: 8px 0;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.usuario-intentos .intento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    background: #e9ecef;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.intento-fecha-header {
+    font-weight: bold;
+    color: #003366;
+    font-size: 0.95em;
+}
+
+.intento-actualizacion {
+    color: #666;
+    font-size: 0.85em;
+    font-style: italic;
+}
+
+.usuario-intentos .intento-detalle {
+    margin-top: 10px;
+    padding: 10px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}

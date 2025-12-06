@@ -8,11 +8,25 @@
     <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
 
     <script>
+        function toggleUsuario(usuarioComponenteId) {
+            const intentosContainer = document.getElementById('intentos-' + usuarioComponenteId);
+            const usuarioItem = intentosContainer.closest('.usuario-item');
+            const icono = usuarioItem.querySelector('.usuario-header .expand-icon');
+
+            if (intentosContainer.classList.contains('show')) {
+                intentosContainer.classList.remove('show');
+                if (icono) icono.classList.remove('expanded');
+            } else {
+                intentosContainer.classList.add('show');
+                if (icono) icono.classList.add('expanded');
+            }
+        }
+
         function toggleIntento(intentoId) {
             const detalle = document.getElementById('detalle-' + intentoId);
             const intentoItem = detalle.closest('.intento-item');
             const icono = intentoItem.querySelector('.expand-icon');
-            
+
             if (detalle.classList.contains('show')) {
                 detalle.classList.remove('show');
                 if (icono) icono.classList.remove('expanded');
@@ -81,73 +95,87 @@
                                 </div>
                             </div>
                             
-                            <div class="intentos-list">
-                                {% if componente_item.intentos %}
-                                    {% for intento in componente_item.intentos %}
-                                        <div class="intento-item">
-                                            <div class="intento-header" onclick="toggleIntento({{ intento.id }})">
+                            <div class="usuarios-list">
+                                {% if componente_item.usuarios_intentos %}
+                                    {% for usuario_item in componente_item.usuarios_intentos %}
+                                        <div class="usuario-item">
+                                            <div class="usuario-header" onclick="toggleUsuario('{{ usuario_item.usuario.id }}-{{ componente_item.componente.id }}')">
                                                 <div>
-                                                    <span class="intento-usuario">{{ intento.usuario.username }}</span>
+                                                    <span class="usuario-nombre">{{ usuario_item.usuario.username }}</span>
+                                                    <span class="intentos-count">({{ usuario_item.total_intentos }} intento{{ usuario_item.total_intentos|pluralize }})</span>
                                                     <span class="expand-icon">▶</span>
                                                 </div>
-                                                <span class="intento-fecha">{{ intento.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                                                <span class="ultimo-intento">Último: {{ usuario_item.ultimo_intento.fecha_creacion|date:"d/m/Y H:i" }}</span>
                                             </div>
-                                            <div class="intento-info">
-                                                Última actualización: {{ intento.fecha_actualizacion|date:"d/m/Y H:i" }}
-                                            </div>
-                                            
-                                            <div class="intento-detalle" id="detalle-{{ intento.id }}">
-                                                {% if componente_item.componente.formulario %}
-                                                    {% with formulario=componente_item.componente.formulario %}
-                                                        {% for pregunta in formulario.preguntas.all %}
-                                                            <div class="pregunta-item">
-                                                                <div class="pregunta-texto">
-                                                                    {{ forloop.counter }}. {{ pregunta.texto }}
-                                                                </div>
-                                                                <div class="pregunta-tipo">
-                                                                    {{ pregunta.get_tipo_display }}
-                                                                </div>
-                                                                <div class="respuesta-item">
-                                                                    <div class="respuesta-label">Respuesta:</div>
-                                                                    <div class="respuesta-texto">
-                                                                        {% for resp in intento.respuestas.all %}
-                                                                            {% if resp.pregunta.id == pregunta.id %}
-                                                                                {% if pregunta.tipo == 'abierta' %}
-                                                                                    {% if resp.texto %}
-                                                                                        {{ resp.texto|default:"Sin respuesta" }}
-                                                                                    {% else %}
-                                                                                        <span class="sin-respuesta">Sin respuesta</span>
-                                                                                    {% endif %}
-                                                                                {% elif pregunta.tipo == 'opcion_multiple' %}
-                                                                                    {% if resp.opcion %}
-                                                                                        {{ resp.opcion.texto }}
-                                                                                        {% if resp.opcion.correcta %}
-                                                                                            <span style="color: #4CAF50; margin-left: 10px; font-weight: bold;">✓ Correcta</span>
-                                                                                        {% else %}
-                                                                                            <span style="color: #f44336; margin-left: 10px; font-weight: bold;">✗ Incorrecta</span>
-                                                                                        {% endif %}
-                                                                                    {% else %}
-                                                                                        <span class="sin-respuesta">Sin respuesta</span>
-                                                                                    {% endif %}
-                                                                                {% endif %}
-                                                                            {% endif %}
-                                                                        {% empty %}
-                                                                            <span class="sin-respuesta">Sin respuesta</span>
-                                                                        {% endfor %}
-                                                                        
-                                                                        {% if not intento.respuestas.all %}
-                                                                            <span class="sin-respuesta">Sin respuesta</span>
-                                                                        {% endif %}
-                                                                    </div>
-                                                                </div>
+
+                                            <div class="usuario-intentos" id="intentos-{{ usuario_item.usuario.id }}-{{ componente_item.componente.id }}">
+                                                {% for intento in usuario_item.intentos %}
+                                                    <div class="intento-item">
+                                                        <div class="intento-header" onclick="toggleIntento({{ intento.id }})">
+                                                            <div>
+                                                                <span class="intento-fecha-header">Intento del {{ intento.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                                                                <span class="expand-icon">▶</span>
                                                             </div>
-                                                        {% endfor %}
-                                                    {% endwith %}
-                                                {% else %}
-                                                    <p style="color: #999; font-style: italic; padding: 10px;">
-                                                        Este componente no tiene formulario asociado.
-                                                    </p>
-                                                {% endif %}
+                                                            {% if intento.fecha_actualizacion != intento.fecha_creacion %}
+                                                                <span class="intento-actualizacion">Actualizado: {{ intento.fecha_actualizacion|date:"d/m/Y H:i" }}</span>
+                                                            {% endif %}
+                                                        </div>
+
+                                                        <div class="intento-detalle" id="detalle-{{ intento.id }}">
+                                                            {% if componente_item.componente.formulario %}
+                                                                {% with formulario=componente_item.componente.formulario %}
+                                                                    {% for pregunta in formulario.preguntas.all %}
+                                                                        <div class="pregunta-item">
+                                                                            <div class="pregunta-texto">
+                                                                                {{ forloop.counter }}. {{ pregunta.texto }}
+                                                                            </div>
+                                                                            <div class="pregunta-tipo">
+                                                                                {{ pregunta.get_tipo_display }}
+                                                                            </div>
+                                                                            <div class="respuesta-item">
+                                                                                <div class="respuesta-label">Respuesta:</div>
+                                                                                <div class="respuesta-texto">
+                                                                                    {% for resp in intento.respuestas.all %}
+                                                                                        {% if resp.pregunta.id == pregunta.id %}
+                                                                                            {% if pregunta.tipo == 'abierta' %}
+                                                                                                {% if resp.texto %}
+                                                                                                    {{ resp.texto|default:"Sin respuesta" }}
+                                                                                                {% else %}
+                                                                                                    <span class="sin-respuesta">Sin respuesta</span>
+                                                                                                {% endif %}
+                                                                                            {% elif pregunta.tipo == 'opcion_multiple' %}
+                                                                                                {% if resp.opcion %}
+                                                                                                    {{ resp.opcion.texto }}
+                                                                                                    {% if resp.opcion.correcta %}
+                                                                                                        <span style="color: #4CAF50; margin-left: 10px; font-weight: bold;">✓ Correcta</span>
+                                                                                                    {% else %}
+                                                                                                        <span style="color: #f44336; margin-left: 10px; font-weight: bold;">✗ Incorrecta</span>
+                                                                                                    {% endif %}
+                                                                                                {% else %}
+                                                                                                    <span class="sin-respuesta">Sin respuesta</span>
+                                                                                                {% endif %}
+                                                                                            {% endif %}
+                                                                                        {% endif %}
+                                                                                    {% empty %}
+                                                                                        <span class="sin-respuesta">Sin respuesta</span>
+                                                                                    {% endfor %}
+
+                                                                                    {% if not intento.respuestas.all %}
+                                                                                        <span class="sin-respuesta">Sin respuesta</span>
+                                                                                    {% endif %}
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    {% endfor %}
+                                                                {% endwith %}
+                                                            {% else %}
+                                                                <p style="color: #999; font-style: italic; padding: 10px;">
+                                                                    Este componente no tiene formulario asociado.
+                                                                </p>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
                                             </div>
                                         </div>
                                     {% endfor %}

@@ -9,14 +9,17 @@ def examen_detalle(request, componente_id):
     formulario = componente.formulario
     preguntas = formulario.preguntas.prefetch_related('opciones').all() if formulario else []
     mensaje = None
+    puede_acceder = puede_acceder_componente(request, componente)
 
     if request.method == "POST":
         if not request.user.is_authenticated:
             mensaje = "Debes iniciar sesión para responder el examen."
+        elif not puede_acceder:
+            mensaje = f"Has agotado el número máximo de intentos ({examen.max_intentos}) para este examen."
         else:
             from formulario.models import Respuesta, Opcion
             from intento.models import Intento
-            
+
             # Crear un Intento para agrupar todas las respuestas
             intento = Intento.objects.create(
                 usuario=request.user,
@@ -51,6 +54,7 @@ def examen_detalle(request, componente_id):
         "formulario": formulario,
         "preguntas": preguntas,
         "mensaje": mensaje,
+        "puede_acceder": puede_acceder,
     })
 
 def cuestionario_detalle(request, componente_id):
@@ -59,14 +63,17 @@ def cuestionario_detalle(request, componente_id):
     formulario = componente.formulario
     preguntas = formulario.preguntas.prefetch_related('opciones').all() if formulario else []
     mensaje = None
+    puede_acceder = puede_acceder_componente(request, componente)
 
     if request.method == "POST":
         if not request.user.is_authenticated:
             mensaje = "Debes iniciar sesión para responder el cuestionario."
+        elif not puede_acceder:
+            mensaje = f"Has agotado el número máximo de intentos ({cuestionario.max_intentos}) para este cuestionario."
         else:
             from formulario.models import Respuesta, Opcion
             from intento.models import Intento
-            
+
             # Crear un Intento para agrupar todas las respuestas
             intento = Intento.objects.create(
                 usuario=request.user,
@@ -101,6 +108,7 @@ def cuestionario_detalle(request, componente_id):
         "formulario": formulario,
         "preguntas": preguntas,
         "mensaje": mensaje,
+        "puede_acceder": puede_acceder,
     })
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
@@ -132,6 +140,21 @@ def agregar_componente(request, actividad_id):
             comp = form.save(commit=False)
             comp.actividad = actividad
             comp.save()
+            
+            # Actualizar max_intentos si es examen o cuestionario
+            max_intentos = request.POST.get('max_intentos')
+            if max_intentos and comp.tipo in ["examen", "cuestionario"]:
+                try:
+                    max_intentos_value = int(max_intentos)
+                    if comp.tipo == "examen" and hasattr(comp, 'examen'):
+                        comp.examen.max_intentos = max_intentos_value
+                        comp.examen.save(update_fields=['max_intentos'])
+                    elif comp.tipo == "cuestionario" and hasattr(comp, 'cuestionario'):
+                        comp.cuestionario.max_intentos = max_intentos_value
+                        comp.cuestionario.save(update_fields=['max_intentos'])
+                except ValueError:
+                    pass  # Si no es un número válido, ignorar
+            
             return redirect('teaching_sequence')
     else:
         form = ComponenteForm()
@@ -155,6 +178,15 @@ def editar_actividad(request, actividad_id):
 def editar_componente(request, componente_id):
     componente = get_object_or_404(Componente, id=componente_id)
     actividad = componente.actividad
+    
+    # Obtener el examen o cuestionario relacionado si existe
+    examen = None
+    cuestionario = None
+    if componente.tipo == "examen" and hasattr(componente, 'examen'):
+        examen = componente.examen
+    elif componente.tipo == "cuestionario" and hasattr(componente, 'cuestionario'):
+        cuestionario = componente.cuestionario
+    
     if request.method == 'POST':
         # Excluir el campo tipo del POST para que no se pueda modificar
         post_data = request.POST.copy()
@@ -166,6 +198,25 @@ def editar_componente(request, componente_id):
         if form.is_valid():
             form.save()
             # titulo se sincroniza automaticamente mediante el signal post_save en models.py
+            
+            # Actualizar max_intentos si es examen o cuestionario
+            if componente.tipo == "examen" and examen:
+                max_intentos = request.POST.get('max_intentos')
+                if max_intentos:
+                    try:
+                        examen.max_intentos = int(max_intentos)
+                        examen.save(update_fields=['max_intentos'])
+                    except ValueError:
+                        pass  # Si no es un número válido, ignorar
+            elif componente.tipo == "cuestionario" and cuestionario:
+                max_intentos = request.POST.get('max_intentos')
+                if max_intentos:
+                    try:
+                        cuestionario.max_intentos = int(max_intentos)
+                        cuestionario.save(update_fields=['max_intentos'])
+                    except ValueError:
+                        pass  # Si no es un número válido, ignorar
+            
             return redirect('teaching_sequence')
     else:
         form = ComponenteForm(instance=componente)
@@ -173,7 +224,13 @@ def editar_componente(request, componente_id):
         form.fields.pop('tipo', None)
         # Excluir el campo formulario (no se puede cambiar desde aquí, solo editar si existe)
         form.fields.pop('formulario', None)
-    return render(request, 'contenido/componente_form.html', {'form': form, 'actividad': actividad, 'componente': componente})
+    return render(request, 'contenido/componente_form.html', {
+        'form': form, 
+        'actividad': actividad, 
+        'componente': componente,
+        'examen': examen,
+        'cuestionario': cuestionario
+    })
 
 def register(request):
     if request.method == 'POST':
@@ -272,7 +329,7 @@ def eliminar_actividad(request, actividad_id):
 
 def editar_glosario_global(request):
     glosario = GlosarioGlobal.objects.last()
-    
+
     # Si no existe, lo crea al vuelo
     if not glosario:
         glosario = GlosarioGlobal.objects.create(titulo="Recursos del Curso", contenido="")
@@ -289,3 +346,30 @@ def editar_glosario_global(request):
         form = BloqueApoyoForm(instance=glosario)
 
     return render(request, 'contenido/bloque_form.html', {'form': form})
+
+
+def puede_acceder_componente(request, componente):
+    """
+    Verifica si el usuario puede acceder a un componente (examen/cuestionario).
+    Retorna True si puede acceder, False si ha agotado los intentos.
+    """
+    if not request.user.is_authenticated:
+        return True  # Si no está autenticado, puede ver pero no responder
+
+    from intento.models import Intento
+
+    # Contar intentos del usuario para este componente
+    intentos_usuario = Intento.objects.filter(
+        usuario=request.user,
+        componente=componente
+    ).count()
+
+    # Obtener max_intentos según el tipo de componente
+    if componente.tipo == "examen" and hasattr(componente, 'examen'):
+        max_intentos = componente.examen.max_intentos
+    elif componente.tipo == "cuestionario" and hasattr(componente, 'cuestionario'):
+        max_intentos = componente.cuestionario.max_intentos
+    else:
+        return True  # Si no tiene max_intentos definido, permitir acceso
+
+    return intentos_usuario < max_intentos

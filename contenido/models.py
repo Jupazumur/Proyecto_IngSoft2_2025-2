@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-#from ckeditor_uploader.fields import RichTextUploadingField
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django_ckeditor_5.fields import CKEditor5Field
@@ -56,6 +55,7 @@ class Examen(models.Model):
     componente = models.OneToOneField(Componente, on_delete=models.CASCADE, related_name="examen")
     titulo = models.CharField(max_length=255)
     descripcion = CKEditor5Field('Text', config_name='extends', blank=True)
+    max_intentos = models.PositiveIntegerField(default=1, verbose_name="Intentos máximos")
 
     def __str__(self):
         return self.titulo
@@ -64,6 +64,7 @@ class Cuestionario(models.Model):
     componente = models.OneToOneField(Componente, on_delete=models.CASCADE, related_name="cuestionario")
     titulo = models.CharField(max_length=255)
     descripcion = CKEditor5Field('Text', config_name='extends', blank=True)
+    max_intentos = models.PositiveIntegerField(default=1, verbose_name="Intentos máximos")
 
     def __str__(self):
         return self.titulo

@@ -513,6 +513,7 @@ hr {
     color: white;
     cursor: pointer;
     user-select: none;
+    transition: background-color 0.2s;
 }
 .usuario-header:hover { background: #004488; }
 
@@ -527,6 +528,16 @@ hr {
     margin-left: 10px;
 }
 
+.usuario-header .expand-icon {
+    margin-left: 10px;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    font-size: 0.9em;
+}
+.usuario-header .expand-icon.expanded {
+    transform: rotate(90deg);
+}
+
 .ultimo-intento {
     color: #e0e0e0;
     font-size: 0.9em;
@@ -534,11 +545,19 @@ hr {
 
 .usuario-intentos {
     display: none;
-    padding: 15px;
+    padding: 0 15px;
     background: white;
     border-top: 1px solid #e9ecef;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
 }
-.usuario-intentos.show { display: block; }
+.usuario-intentos.show { 
+    display: block;
+    padding: 15px;
+    max-height: 5000px;
+    transition: max-height 0.5s ease-in, padding 0.3s ease-in;
+}
 
 /* Estilos para los intentos individuales dentro de cada usuario */
 .usuario-intentos .intento-item {

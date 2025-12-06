@@ -132,6 +132,21 @@ def agregar_componente(request, actividad_id):
             comp = form.save(commit=False)
             comp.actividad = actividad
             comp.save()
+            
+            # Actualizar max_intentos si es examen o cuestionario
+            max_intentos = request.POST.get('max_intentos')
+            if max_intentos and comp.tipo in ["examen", "cuestionario"]:
+                try:
+                    max_intentos_value = int(max_intentos)
+                    if comp.tipo == "examen" and hasattr(comp, 'examen'):
+                        comp.examen.max_intentos = max_intentos_value
+                        comp.examen.save(update_fields=['max_intentos'])
+                    elif comp.tipo == "cuestionario" and hasattr(comp, 'cuestionario'):
+                        comp.cuestionario.max_intentos = max_intentos_value
+                        comp.cuestionario.save(update_fields=['max_intentos'])
+                except ValueError:
+                    pass  # Si no es un número válido, ignorar
+            
             return redirect('teaching_sequence')
     else:
         form = ComponenteForm()
@@ -155,6 +170,15 @@ def editar_actividad(request, actividad_id):
 def editar_componente(request, componente_id):
     componente = get_object_or_404(Componente, id=componente_id)
     actividad = componente.actividad
+    
+    # Obtener el examen o cuestionario relacionado si existe
+    examen = None
+    cuestionario = None
+    if componente.tipo == "examen" and hasattr(componente, 'examen'):
+        examen = componente.examen
+    elif componente.tipo == "cuestionario" and hasattr(componente, 'cuestionario'):
+        cuestionario = componente.cuestionario
+    
     if request.method == 'POST':
         # Excluir el campo tipo del POST para que no se pueda modificar
         post_data = request.POST.copy()
@@ -166,6 +190,25 @@ def editar_componente(request, componente_id):
         if form.is_valid():
             form.save()
             # titulo se sincroniza automaticamente mediante el signal post_save en models.py
+            
+            # Actualizar max_intentos si es examen o cuestionario
+            if componente.tipo == "examen" and examen:
+                max_intentos = request.POST.get('max_intentos')
+                if max_intentos:
+                    try:
+                        examen.max_intentos = int(max_intentos)
+                        examen.save(update_fields=['max_intentos'])
+                    except ValueError:
+                        pass  # Si no es un número válido, ignorar
+            elif componente.tipo == "cuestionario" and cuestionario:
+                max_intentos = request.POST.get('max_intentos')
+                if max_intentos:
+                    try:
+                        cuestionario.max_intentos = int(max_intentos)
+                        cuestionario.save(update_fields=['max_intentos'])
+                    except ValueError:
+                        pass  # Si no es un número válido, ignorar
+            
             return redirect('teaching_sequence')
     else:
         form = ComponenteForm(instance=componente)
@@ -173,7 +216,13 @@ def editar_componente(request, componente_id):
         form.fields.pop('tipo', None)
         # Excluir el campo formulario (no se puede cambiar desde aquí, solo editar si existe)
         form.fields.pop('formulario', None)
-    return render(request, 'contenido/componente_form.html', {'form': form, 'actividad': actividad, 'componente': componente})
+    return render(request, 'contenido/componente_form.html', {
+        'form': form, 
+        'actividad': actividad, 
+        'componente': componente,
+        'examen': examen,
+        'cuestionario': cuestionario
+    })
 
 def register(request):
     if request.method == 'POST':

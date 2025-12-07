@@ -46,7 +46,8 @@ def examen_detalle(request, componente_id):
                             usuario=request.user.username,
                             intento=intento
                         )
-            mensaje = "Respuestas enviadas correctamente."
+            # Redirigir a la página de resultados del intento
+            return redirect('intento_resultado', intento_id=intento.id)
 
     return render(request, "contenido/examen_detalle.html", {
         "componente": componente,
@@ -100,7 +101,8 @@ def cuestionario_detalle(request, componente_id):
                             usuario=request.user.username,
                             intento=intento
                         )
-            mensaje = "Respuestas enviadas correctamente."
+            # Redirigir a la página de resultados del intento
+            return redirect('intento_resultado', intento_id=intento.id)
 
     return render(request, "contenido/cuestionario_detalle.html", {
         "componente": componente,
@@ -373,3 +375,104 @@ def puede_acceder_componente(request, componente):
         return True  # Si no tiene max_intentos definido, permitir acceso
 
     return intentos_usuario < max_intentos
+
+
+def intento_resultado(request, intento_id):
+    """
+    Muestra los resultados de un intento de examen o cuestionario,
+    incluyendo las respuestas del usuario y si son correctas o incorrectas.
+    """
+    from intento.models import Intento
+    from formulario.models import Respuesta
+    
+    intento = get_object_or_404(Intento, id=intento_id)
+    
+    # Verificar que el usuario tenga permiso para ver este intento
+    if request.user != intento.usuario and not request.user.is_staff:
+        from django.http import Http404
+        raise Http404("No tienes permiso para ver este intento.")
+    
+    componente = intento.componente
+    formulario = componente.formulario
+    preguntas = formulario.preguntas.prefetch_related('opciones').all() if formulario else []
+    
+    # Obtener todas las respuestas de este intento
+    respuestas_intento = {resp.pregunta.id: resp for resp in intento.respuestas.select_related('pregunta', 'opcion').all()}
+    
+    # Preparar los datos para el template
+    resultados = []
+    total_preguntas = len(preguntas)
+    preguntas_correctas = 0
+    preguntas_incorrectas = 0
+    preguntas_abiertas = 0
+    
+    for pregunta in preguntas:
+        respuesta_usuario = respuestas_intento.get(pregunta.id)
+        
+        resultado_pregunta = {
+            'pregunta': pregunta,
+            'respuesta_usuario': respuesta_usuario,
+            'es_correcta': None,
+            'opcion_correcta': None,
+        }
+        
+        if pregunta.tipo == 'opcion_multiple':
+            # Para preguntas de opción múltiple, determinar si la respuesta es correcta
+            if respuesta_usuario and respuesta_usuario.opcion:
+                resultado_pregunta['es_correcta'] = respuesta_usuario.opcion.correcta
+                if resultado_pregunta['es_correcta']:
+                    preguntas_correctas += 1
+                else:
+                    preguntas_incorrectas += 1
+                    
+                # Obtener la opción correcta para mostrarla
+                opcion_correcta = pregunta.opciones.filter(correcta=True).first()
+                resultado_pregunta['opcion_correcta'] = opcion_correcta
+            else:
+                preguntas_incorrectas += 1
+                # Si no respondió, mostrar cuál era la respuesta correcta
+                opcion_correcta = pregunta.opciones.filter(correcta=True).first()
+                resultado_pregunta['opcion_correcta'] = opcion_correcta
+        else:
+            # Para preguntas abiertas, no se puede determinar automáticamente
+            preguntas_abiertas += 1
+            resultado_pregunta['es_correcta'] = None
+        
+        resultados.append(resultado_pregunta)
+    
+    # Determinar si es examen o cuestionario
+    examen = None
+    cuestionario = None
+    tipo_componente = None
+    titulo_componente = None
+    
+    if componente.tipo == "examen" and hasattr(componente, 'examen'):
+        examen = componente.examen
+        tipo_componente = "examen"
+        titulo_componente = examen.titulo
+    elif componente.tipo == "cuestionario" and hasattr(componente, 'cuestionario'):
+        cuestionario = componente.cuestionario
+        tipo_componente = "cuestionario"
+        titulo_componente = cuestionario.titulo
+    
+    # Calcular porcentaje de aciertos (solo para preguntas de opción múltiple)
+    preguntas_opcion_multiple = total_preguntas - preguntas_abiertas
+    porcentaje_aciertos = None
+    if preguntas_opcion_multiple > 0:
+        porcentaje_aciertos = round((preguntas_correctas / preguntas_opcion_multiple) * 100, 2)
+    
+    return render(request, "contenido/intento_resultado.html", {
+        "intento": intento,
+        "componente": componente,
+        "examen": examen,
+        "cuestionario": cuestionario,
+        "tipo_componente": tipo_componente,
+        "titulo_componente": titulo_componente,
+        "resultados": resultados,
+        "total_preguntas": total_preguntas,
+        "preguntas_correctas": preguntas_correctas,
+        "preguntas_incorrectas": preguntas_incorrectas,
+        "preguntas_abiertas": preguntas_abiertas,
+        "preguntas_opcion_multiple": preguntas_opcion_multiple,
+        "porcentaje_aciertos": porcentaje_aciertos,
+    })

@@ -8,56 +8,91 @@
 </head>
 <body>
 
-
-<h1>Cuestionario: {{ cuestionario.titulo }}</h1>
-
-{% if cuestionario.descripcion %}
-<div>
-    {{ cuestionario.descripcion|safe }}
-</div>
-{% endif %}
-
-<hr>
-
-{% if mensaje %}
-    <p style="color: green;">{{ mensaje }}</p>
-{% endif %}
-
-{% if preguntas %}
+<header>
+    <div class="navbar">
+        <strong>Plataforma</strong>
+        <a href="#">Inicio</a>
+        <a href="#">Cursos</a>
+        <a href="#">Ayuda</a>
+    </div>
+    <div style="float: right;">
     {% if user.is_authenticated %}
-        {% if puede_acceder %}
-            <form method="post">
-                {% csrf_token %}
-                {% for pregunta in preguntas %}
-                    <div style="margin-bottom: 20px;">
-                        <strong>{{ forloop.counter }}. {{ pregunta.texto }}</strong><br>
-                        {% if pregunta.tipo == 'abierta' %}
-                            <textarea name="pregunta_{{ pregunta.id }}" rows="2" style="width:100%;"></textarea>
-                        {% elif pregunta.tipo == 'opcion_multiple' %}
-                            {% for opcion in pregunta.opciones.all %}
-                                <label>
-                                    <input type="radio" name="pregunta_{{ pregunta.id }}" value="{{ opcion.id }}"> {{ opcion.texto }}
-                                </label><br>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                {% endfor %}
-                <button type="submit">Enviar respuestas</button>
-            </form>
+        {{ user.username }} |
+        <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" style="background:none;border:none;color:white;cursor:pointer;">Cerrar sesión</button>
+        </form>
+    {% else %}
+        <a href="{% url 'register' %}">Registrarse</a> |
+        <a href="{% url 'login' %}?next={{ request.path }}">Iniciar sesión</a>
+    {% endif %}
+    </div>
+</header>
+
+<div class="subheader">
+    <div class="subnav">
+        <a href="{% url 'teaching_sequence' %}">Volver a Secuencia</a>
+    </div>
+</div>
+
+<div class="content">
+    <h1 style="color: #003366; border-left: 5px solid #005599; padding-left: 10px; margin-top: 0;">Cuestionario: {{ cuestionario.titulo }}</h1>
+
+    {% if cuestionario.descripcion %}
+    <div class="descripcion" style="margin-bottom: 30px;">
+        {{ cuestionario.descripcion|safe }}
+    </div>
+    {% endif %}
+
+    <hr style="clear: both; margin: 30px 0;">
+
+    {% if mensaje %}
+        <div class="component" style="background-color: #d4edda; border-left-color: #28a745;">
+            <p style="color: #155724; margin: 0;">{{ mensaje }}</p>
+        </div>
+    {% endif %}
+
+    {% if preguntas %}
+        {% if user.is_authenticated %}
+            {% if puede_acceder %}
+                <form method="post" style="margin-top: 30px;">
+                    {% csrf_token %}
+                    {% for pregunta in preguntas %}
+                        <div class="component" style="margin-bottom: 20px;">
+                            <strong style="color: #003366; display: block; margin-bottom: 10px;">{{ forloop.counter }}. {{ pregunta.texto }}</strong>
+                            {% if pregunta.tipo == 'abierta' %}
+                                <textarea name="pregunta_{{ pregunta.id }}" rows="3" style="width:100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; font-family: inherit; box-sizing: border-box;"></textarea>
+                            {% elif pregunta.tipo == 'opcion_multiple' %}
+                                <div style="margin-top: 10px;">
+                                    {% for opcion in pregunta.opciones.all %}
+                                        <label style="display: block; padding: 8px; margin-bottom: 5px; cursor: pointer;">
+                                            <input type="radio" name="pregunta_{{ pregunta.id }}" value="{{ opcion.id }}" style="margin-right: 8px;"> {{ opcion.texto }}
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn-guardar">Enviar respuestas</button>
+                </form>
+            {% else %}
+                <div class="component" style="background-color: #ffe6e6; border-left-color: #dc3545; margin: 20px 0;">
+                    <h3 style="color: #dc3545; margin-top: 0;">Acceso restringido</h3>
+                    <p style="color: #721c24; margin-bottom: 0;">Has agotado el número máximo de intentos permitidos para este cuestionario. No puedes realizar más intentos.</p>
+                </div>
+                <p style="color: #666;">Si necesitas más intentos, contacta con el administrador del curso.</p>
+            {% endif %}
         {% else %}
-            <div style="background-color: #ffe6e6; border: 2px solid #ff0000; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <h3 style="color: #cc0000; margin-top: 0;">Acceso restringido</h3>
-                <p style="color: #cc0000; margin-bottom: 0;">Has agotado el número máximo de intentos permitidos para este cuestionario. No puedes realizar más intentos.</p>
+            <div class="component">
+                <p><a href="{% url 'login' %}?next={{ request.path }}" style="color: #005599; text-decoration: none;">Inicia sesión para responder el cuestionario</a></p>
             </div>
-            <p style="color: #666;">Si necesitas más intentos, contacta con el administrador del curso.</p>
         {% endif %}
     {% else %}
-        <p><a href="{% url 'login' %}?next={{ request.path }}">Inicia sesión para responder el cuestionario</a></p>
+        <div class="component">
+            <p style="color: #999; font-style: italic;">No hay preguntas en este cuestionario.</p>
+        </div>
     {% endif %}
-{% else %}
-    <p>No hay preguntas en este cuestionario.</p>
-{% endif %}
-<a href="{% url 'teaching_sequence' %}">Volver</a>
+</div>
 
 {% if glosario_global or user.is_staff %}
     <button class="btn-conceptos-global" onclick="toggleGlosario()">

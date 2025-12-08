@@ -66,7 +66,7 @@
     <form method="post" style="margin-top: 30px;">
         {% csrf_token %}
         <div style="margin-bottom: 15px;">
-            <textarea name="texto" rows="4" style="width:100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; font-family: inherit; box-sizing: border-box;"></textarea>
+            <textarea name="texto" rows="4" style="width:100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; font-family: inherit; box-sizing: border-box; resize: vertical;"></textarea>
         </div>
         <button type="submit" class="btn-guardar">Publicar comentario</button>
     </form>

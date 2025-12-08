@@ -61,7 +61,7 @@
                         <div class="component" style="margin-bottom: 20px;">
                             <strong style="color: #003366; display: block; margin-bottom: 10px;">{{ forloop.counter }}. {{ pregunta.texto }}</strong>
                             {% if pregunta.tipo == 'abierta' %}
-                                <textarea name="pregunta_{{ pregunta.id }}" rows="3" style="width:100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; font-family: inherit; box-sizing: border-box;"></textarea>
+                                <textarea name="pregunta_{{ pregunta.id }}" rows="3" style="width:100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; font-family: inherit; box-sizing: border-box; resize: vertical;"></textarea>
                             {% elif pregunta.tipo == 'opcion_multiple' %}
                                 <div style="margin-top: 10px;">
                                     {% for opcion in pregunta.opciones.all %}

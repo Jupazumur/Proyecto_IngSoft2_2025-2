@@ -6,54 +6,77 @@
     <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
     <title>Resultados: {{ titulo_componente }}</title>
     <style>
+        body {
+            background-color: #eef2f5;
+            padding: 20px;
+        }
+        .content-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #003366;
+            border-left: 5px solid #005599;
+            padding-left: 15px;
+            margin-top: 0;
+        }
+        h2 {
+            color: #003366;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
         .resultado-correcto {
-            background-color: #d4edda;
-            border: 2px solid #28a745;
-            border-radius: 5px;
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            border-radius: 4px;
             padding: 15px;
             margin-bottom: 20px;
         }
         .resultado-incorrecto {
-            background-color: #f8d7da;
-            border: 2px solid #dc3545;
-            border-radius: 5px;
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            border-radius: 4px;
             padding: 15px;
             margin-bottom: 20px;
         }
         .resultado-abierta {
-            background-color: #fff3cd;
-            border: 2px solid #ffc107;
-            border-radius: 5px;
+            background-color: #fff9e6;
+            border-left: 4px solid #ff9800;
+            border-radius: 4px;
             padding: 15px;
             margin-bottom: 20px;
         }
         .icono-correcto {
-            color: #28a745;
+            color: #4caf50;
             font-weight: bold;
             font-size: 1.2em;
         }
         .icono-incorrecto {
-            color: #dc3545;
+            color: #f44336;
             font-weight: bold;
             font-size: 1.2em;
         }
         .icono-abierta {
-            color: #ffc107;
+            color: #ff9800;
             font-weight: bold;
             font-size: 1.2em;
         }
         .opcion-correcta {
-            color: #28a745;
+            color: #2e7d32;
             font-weight: bold;
         }
         .opcion-incorrecta {
-            color: #dc3545;
+            color: #c62828;
             text-decoration: line-through;
         }
         .resumen-estadisticas {
-            background-color: #e9ecef;
-            border: 2px solid #6c757d;
-            border-radius: 5px;
+            background-color: #f0f4f8;
+            border-left: 4px solid #005599;
+            border-radius: 4px;
             padding: 20px;
             margin-bottom: 30px;
         }
@@ -61,10 +84,36 @@
             margin: 10px 0;
             font-size: 1.1em;
         }
+        .btn-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #005599;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+        }
+        .btn-link:hover {
+            background-color: #003366;
+        }
+        .btn-link-secondary {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .btn-link-secondary:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
 
+<div class="content-container">
 <h1>Resultados del {{ tipo_componente|capfirst }}: {{ titulo_componente }}</h1>
 
 <div class="resumen-estadisticas">
@@ -77,15 +126,15 @@
     </div>
     {% if preguntas_correctas > 0 or preguntas_incorrectas > 0 %}
     <div class="estadistica-item">
-        <strong style="color: #28a745;">Preguntas correctas:</strong> {{ preguntas_correctas }}
+        <strong style="color: #2e7d32;">Preguntas correctas:</strong> {{ preguntas_correctas }}
     </div>
     <div class="estadistica-item">
-        <strong style="color: #dc3545;">Preguntas incorrectas:</strong> {{ preguntas_incorrectas }}
+        <strong style="color: #c62828;">Preguntas incorrectas:</strong> {{ preguntas_incorrectas }}
     </div>
     {% endif %}
     {% if preguntas_abiertas > 0 %}
     <div class="estadistica-item">
-        <strong style="color: #ffc107;">Preguntas abiertas (requieren revisión):</strong> {{ preguntas_abiertas }}
+        <strong style="color: #e65100;">Preguntas abiertas (requieren revisión):</strong> {{ preguntas_abiertas }}
     </div>
     {% endif %}
     {% if porcentaje_aciertos is not None %}
@@ -97,7 +146,7 @@
     {% endif %}
 </div>
 
-<hr>
+<hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
 
 <h2>Detalle de Respuestas</h2>
 
@@ -106,13 +155,13 @@
         <div style="display: flex; align-items: center; margin-bottom: 10px;">
             {% if resultado.es_correcta == True %}
                 <span class="icono-correcto">✓</span>
-                <strong style="margin-left: 10px; color: #28a745;">{{ forloop.counter }}. {{ resultado.pregunta.texto }}</strong>
+                <strong style="margin-left: 10px; color: #2e7d32;">{{ forloop.counter }}. {{ resultado.pregunta.texto }}</strong>
             {% elif resultado.es_correcta == False %}
                 <span class="icono-incorrecto">✗</span>
-                <strong style="margin-left: 10px; color: #dc3545;">{{ forloop.counter }}. {{ resultado.pregunta.texto }}</strong>
+                <strong style="margin-left: 10px; color: #c62828;">{{ forloop.counter }}. {{ resultado.pregunta.texto }}</strong>
             {% else %}
                 <span class="icono-abierta">?</span>
-                <strong style="margin-left: 10px; color: #856404;">{{ forloop.counter }}. {{ resultado.pregunta.texto }}</strong>
+                <strong style="margin-left: 10px; color: #e65100;">{{ forloop.counter }}. {{ resultado.pregunta.texto }}</strong>
             {% endif %}
         </div>
 
@@ -120,11 +169,11 @@
             <div style="margin-left: 30px;">
                 <p><strong>Tu respuesta:</strong></p>
                 {% if resultado.respuesta_usuario and resultado.respuesta_usuario.opcion %}
-                    <div class="{% if resultado.es_correcta %}opcion-correcta{% else %}opcion-incorrecta{% endif %}" style="padding: 5px; background-color: {% if resultado.es_correcta %}#d4edda{% else %}#f8d7da{% endif %}; border-radius: 3px; margin: 5px 0;">
+                    <div class="{% if resultado.es_correcta %}opcion-correcta{% else %}opcion-incorrecta{% endif %}" style="padding: 8px; background-color: {% if resultado.es_correcta %}#e8f5e9{% else %}#ffebee{% endif %}; border-radius: 4px; margin: 5px 0; border-left: 3px solid {% if resultado.es_correcta %}#4caf50{% else %}#f44336{% endif %};">
                         {{ resultado.respuesta_usuario.opcion.texto }}
                     </div>
                 {% else %}
-                    <div style="padding: 5px; background-color: #f8d7da; border-radius: 3px; margin: 5px 0; color: #dc3545;">
+                    <div style="padding: 8px; background-color: #ffebee; border-radius: 4px; margin: 5px 0; color: #c62828; border-left: 3px solid #f44336;">
                         No respondiste esta pregunta
                     </div>
                 {% endif %}
@@ -132,7 +181,7 @@
                 {% if resultado.es_correcta == False or not resultado.respuesta_usuario %}
                     {% if resultado.opcion_correcta %}
                         <p style="margin-top: 10px;"><strong>Respuesta correcta:</strong></p>
-                        <div class="opcion-correcta" style="padding: 5px; background-color: #d4edda; border-radius: 3px; margin: 5px 0;">
+                        <div class="opcion-correcta" style="padding: 8px; background-color: #e8f5e9; border-radius: 4px; margin: 5px 0; border-left: 3px solid #4caf50;">
                             {{ resultado.opcion_correcta.texto }}
                         </div>
                     {% endif %}
@@ -142,15 +191,15 @@
             <div style="margin-left: 30px;">
                 <p><strong>Tu respuesta:</strong></p>
                 {% if resultado.respuesta_usuario and resultado.respuesta_usuario.texto %}
-                    <div style="padding: 10px; background-color: #fff3cd; border-radius: 3px; margin: 5px 0; border: 1px solid #ffc107;">
+                    <div style="padding: 10px; background-color: #fff9e6; border-radius: 4px; margin: 5px 0; border-left: 3px solid #ff9800;">
                         {{ resultado.respuesta_usuario.texto }}
                     </div>
                 {% else %}
-                    <div style="padding: 5px; background-color: #f8d7da; border-radius: 3px; margin: 5px 0; color: #dc3545;">
+                    <div style="padding: 8px; background-color: #ffebee; border-radius: 4px; margin: 5px 0; color: #c62828; border-left: 3px solid #f44336;">
                         No respondiste esta pregunta
                     </div>
                 {% endif %}
-                <p style="margin-top: 10px; font-style: italic; color: #856404;">
+                <p style="margin-top: 10px; font-style: italic; color: #e65100;">
                     Nota: Las preguntas abiertas requieren revisión manual por parte del instructor.
                 </p>
             </div>
@@ -160,11 +209,12 @@
 
 <div style="margin-top: 30px;">
     {% if tipo_componente == "examen" %}
-        <a href="{% url 'examen_detalle' componente.id %}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">Volver al Examen</a>
+        <a href="{% url 'examen_detalle' componente.id %}" class="btn-link">Volver al Examen</a>
     {% elif tipo_componente == "cuestionario" %}
-        <a href="{% url 'cuestionario_detalle' componente.id %}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">Volver al Cuestionario</a>
+        <a href="{% url 'cuestionario_detalle' componente.id %}" class="btn-link">Volver al Cuestionario</a>
     {% endif %}
-    <a href="{% url 'teaching_sequence' %}" style="display: inline-block; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px;">Volver a la Secuencia</a>
+    <a href="{% url 'teaching_sequence' %}" class="btn-link-secondary">Volver a la Secuencia</a>
+</div>
 </div>
 
 {% if glosario_global or user.is_staff %}

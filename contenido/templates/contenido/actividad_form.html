@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <title>Nueva Actividad</title>
-    <style>body{font-family:sans-serif;padding:20px}</style>
+    <meta charset="UTF-8">
+    <title>{% if actividad %}Editar Actividad{% else %}Nueva Actividad{% endif %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
     {% if form.media %}{{ form.media }}{% endif %}
-    </head>
+</head>
 <body>
-    <h1>{% if actividad %}Editar actividad{% else %}Nueva actividad{% endif %}</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">{% if actividad %}Guardar cambios{% else %}Crear{% endif %}</button>
-        <a href="{% url 'teaching_sequence' %}">Cancelar</a>
-    </form>
+    <div class="edit-container">
+        <h1>{% if actividad %}Editar actividad{% else %}Nueva actividad{% endif %}</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div style="margin-top: 30px;">
+                <button type="submit" class="btn-guardar">{% if actividad %}Guardar cambios{% else %}Crear{% endif %}</button>
+                <a href="{% url 'teaching_sequence' %}" class="btn-cancelar">Cancelar</a>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

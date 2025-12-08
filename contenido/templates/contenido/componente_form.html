@@ -50,6 +50,33 @@
                 {% endif %}
             </div>
             
+            {% if componente %}
+                {% if componente.tipo != "foro" %}
+                <div class="form-group" id="max-intentos-group">
+                    <label for="id_max_intentos">Intentos máximos:</label>
+                    <input type="number" 
+                           name="max_intentos" 
+                           id="id_max_intentos" 
+                           value="{% if examen %}{{ examen.max_intentos }}{% elif cuestionario %}{{ cuestionario.max_intentos }}{% else %}1{% endif %}" 
+                           min="1" 
+                           class="form-control"
+                           required>
+                    <small style="color: #666;">Número máximo de intentos permitidos para este examen/cuestionario.</small>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="form-group" id="max-intentos-group" style="display: none;">
+                    <label for="id_max_intentos">Intentos máximos:</label>
+                    <input type="number" 
+                           name="max_intentos" 
+                           id="id_max_intentos" 
+                           value="1" 
+                           min="1" 
+                           class="form-control">
+                    <small style="color: #666;">Número máximo de intentos permitidos para este examen/cuestionario.</small>
+                </div>
+            {% endif %}
+            
             {% if componente and componente.tipo != "foro" and componente.formulario %}
             <div class="form-group" style="background: #f9f9f9; padding: 10px; border-radius: 5px; border: 1px solid #eee;">
                 <label style="display:inline;">Configuración del Examen/Cuestionario:</label>
@@ -68,6 +95,40 @@
             </div>
         </form>
     </div>
+    
+    <script>
+        // Mostrar/ocultar campo max_intentos según el tipo de componente seleccionado
+        {% if not componente %}
+        document.addEventListener('DOMContentLoaded', function() {
+            const tipoSelect = document.querySelector('#id_tipo');
+            const maxIntentosGroup = document.getElementById('max-intentos-group');
+            const maxIntentosInput = document.getElementById('id_max_intentos');
+            
+            function toggleMaxIntentos() {
+                if (tipoSelect && maxIntentosGroup) {
+                    const tipo = tipoSelect.value;
+                    if (tipo === 'foro') {
+                        maxIntentosGroup.style.display = 'none';
+                        if (maxIntentosInput) {
+                            maxIntentosInput.removeAttribute('required');
+                        }
+                    } else {
+                        maxIntentosGroup.style.display = 'block';
+                        if (maxIntentosInput) {
+                            maxIntentosInput.setAttribute('required', 'required');
+                        }
+                    }
+                }
+            }
+            
+            if (tipoSelect) {
+                tipoSelect.addEventListener('change', toggleMaxIntentos);
+                // Ejecutar al cargar la página para establecer el estado inicial
+                toggleMaxIntentos();
+            }
+        });
+        {% endif %}
+    </script>
     
 </body>
 </html>

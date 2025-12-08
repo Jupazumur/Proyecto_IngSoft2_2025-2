@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
+    <title>Resultados: {{ titulo_componente }}</title>
+    <style>
+        .resultado-correcto {
+            background-color: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .resultado-incorrecto {
+            background-color: #f8d7da;
+            border: 2px solid #dc3545;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .resultado-abierta {
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .icono-correcto {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .icono-incorrecto {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .icono-abierta {
+            color: #ffc107;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .opcion-correcta {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .opcion-incorrecta {
+            color: #dc3545;
+            text-decoration: line-through;
+        }
+        .resumen-estadisticas {
+            background-color: #e9ecef;
+            border: 2px solid #6c757d;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .estadistica-item {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Resultados del {{ tipo_componente|capfirst }}: {{ titulo_componente }}</h1>
+
+<div class="resumen-estadisticas">
+    <h2 style="margin-top: 0;">Resumen de Resultados</h2>
+    <div class="estadistica-item">
+        <strong>Fecha del intento:</strong> {{ intento.fecha_creacion|date:"d/m/Y H:i" }}
+    </div>
+    <div class="estadistica-item">
+        <strong>Total de preguntas:</strong> {{ total_preguntas }}
+    </div>
+    {% if preguntas_correctas > 0 or preguntas_incorrectas > 0 %}
+    <div class="estadistica-item">
+        <strong style="color: #28a745;">Preguntas correctas:</strong> {{ preguntas_correctas }}
+    </div>
+    <div class="estadistica-item">
+        <strong style="color: #dc3545;">Preguntas incorrectas:</strong> {{ preguntas_incorrectas }}
+    </div>
+    {% endif %}
+    {% if preguntas_abiertas > 0 %}
+    <div class="estadistica-item">
+        <strong style="color: #ffc107;">Preguntas abiertas (requieren revisión):</strong> {{ preguntas_abiertas }}
+    </div>
+    {% endif %}
+    {% if porcentaje_aciertos is not None %}
+    <div class="estadistica-item">
+        <strong>Porcentaje de aciertos:</strong> 
+        {{ porcentaje_aciertos }}%
+        ({{ preguntas_correctas }} de {{ preguntas_opcion_multiple }} preguntas de opción múltiple)
+    </div>
+    {% endif %}
+</div>
+
+<hr>
+
+<h2>Detalle de Respuestas</h2>
+
+{% for resultado in resultados %}
+    <div class="{% if resultado.es_correcta == True %}resultado-correcto{% elif resultado.es_correcta == False %}resultado-incorrecto{% else %}resultado-abierta{% endif %}">
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            {% if resultado.es_correcta == True %}
+                <span class="icono-correcto">✓</span>
+                <strong style="margin-left: 10px; color: #28a745;">{{ forloop.counter }}. {{ resultado.pregunta.texto }}</strong>
+            {% elif resultado.es_correcta == False %}
+                <span class="icono-incorrecto">✗</span>
+                <strong style="margin-left: 10px; color: #dc3545;">{{ forloop.counter }}. {{ resultado.pregunta.texto }}</strong>
+            {% else %}
+                <span class="icono-abierta">?</span>
+                <strong style="margin-left: 10px; color: #856404;">{{ forloop.counter }}. {{ resultado.pregunta.texto }}</strong>
+            {% endif %}
+        </div>
+
+        {% if resultado.pregunta.tipo == 'opcion_multiple' %}
+            <div style="margin-left: 30px;">
+                <p><strong>Tu respuesta:</strong></p>
+                {% if resultado.respuesta_usuario and resultado.respuesta_usuario.opcion %}
+                    <div class="{% if resultado.es_correcta %}opcion-correcta{% else %}opcion-incorrecta{% endif %}" style="padding: 5px; background-color: {% if resultado.es_correcta %}#d4edda{% else %}#f8d7da{% endif %}; border-radius: 3px; margin: 5px 0;">
+                        {{ resultado.respuesta_usuario.opcion.texto }}
+                    </div>
+                {% else %}
+                    <div style="padding: 5px; background-color: #f8d7da; border-radius: 3px; margin: 5px 0; color: #dc3545;">
+                        No respondiste esta pregunta
+                    </div>
+                {% endif %}
+                
+                {% if resultado.es_correcta == False or not resultado.respuesta_usuario %}
+                    {% if resultado.opcion_correcta %}
+                        <p style="margin-top: 10px;"><strong>Respuesta correcta:</strong></p>
+                        <div class="opcion-correcta" style="padding: 5px; background-color: #d4edda; border-radius: 3px; margin: 5px 0;">
+                            {{ resultado.opcion_correcta.texto }}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% else %}
+            <div style="margin-left: 30px;">
+                <p><strong>Tu respuesta:</strong></p>
+                {% if resultado.respuesta_usuario and resultado.respuesta_usuario.texto %}
+                    <div style="padding: 10px; background-color: #fff3cd; border-radius: 3px; margin: 5px 0; border: 1px solid #ffc107;">
+                        {{ resultado.respuesta_usuario.texto }}
+                    </div>
+                {% else %}
+                    <div style="padding: 5px; background-color: #f8d7da; border-radius: 3px; margin: 5px 0; color: #dc3545;">
+                        No respondiste esta pregunta
+                    </div>
+                {% endif %}
+                <p style="margin-top: 10px; font-style: italic; color: #856404;">
+                    Nota: Las preguntas abiertas requieren revisión manual por parte del instructor.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}
+
+<div style="margin-top: 30px;">
+    {% if tipo_componente == "examen" %}
+        <a href="{% url 'examen_detalle' componente.id %}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">Volver al Examen</a>
+    {% elif tipo_componente == "cuestionario" %}
+        <a href="{% url 'cuestionario_detalle' componente.id %}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">Volver al Cuestionario</a>
+    {% endif %}
+    <a href="{% url 'teaching_sequence' %}" style="display: inline-block; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px;">Volver a la Secuencia</a>
+</div>
+
+{% if glosario_global or user.is_staff %}
+    <button class="btn-conceptos-global" onclick="toggleGlosario()">
+        📖 Recursos
+    </button>
+
+    <div id="caja-glosario" class="caja-conceptos-global">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #005599; padding-bottom: 10px; margin-bottom: 10px;">
+            <h3 style="margin: 0; color: #005599; font-size: 1.2rem;">
+                {{ glosario_global.titulo|default:"Recursos del Curso" }}
+            </h3>
+            <span onclick="toggleGlosario()" style="cursor: pointer; font-size: 1.5rem; color: #999;">&times;</span>
+        </div>
+
+        <div style="font-size: 0.95rem; line-height: 1.5;">
+            {% if glosario_global %}
+                {{ glosario_global.contenido|safe }}
+            {% else %}
+                <p><em>No hay contenido definido aún.</em></p>
+            {% endif %}
+        </div>
+
+        {% if user.is_staff %}
+            <div style="margin-top: 15px; text-align: right;">
+                <a href="{% url 'editar_glosario_global' %}" style="background-color: #ff9800; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 0.8rem;">
+                    ✏️ Editar Contenido
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endif %}
+
+<script>
+    function toggleGlosario() {
+        var caja = document.getElementById('caja-glosario');
+        if (caja.style.display === "none" || caja.style.display === "") {
+            caja.style.display = "block";
+        } else {
+            caja.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>

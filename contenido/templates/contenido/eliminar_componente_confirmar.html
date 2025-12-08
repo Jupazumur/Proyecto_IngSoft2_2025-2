@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <title>Eliminar Componente</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
     <style>
-        body{font-family:sans-serif;padding:20px}
         .confirm-box {
             background: #fff3cd;
             border: 2px solid #ffc107;
@@ -16,50 +17,40 @@
             margin-top: 0;
             color: #856404;
         }
-        .button-group {
-            margin-top: 20px;
-        }
-        button, a.button {
-            padding: 8px 16px;
-            margin-right: 10px;
-            text-decoration: none;
-            border-radius: 4px;
+        .btn-eliminar {
+            background: #dc3545;
+            color: white;
             border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
             cursor: pointer;
-            display: inline-block;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background 0.3s;
         }
-        button[type="submit"] {
-            background-color: #dc3545;
-            color: white;
-        }
-        button[type="submit"]:hover {
-            background-color: #c82333;
-        }
-        a.button {
-            background-color: #6c757d;
-            color: white;
-        }
-        a.button:hover {
-            background-color: #5a6268;
+        .btn-eliminar:hover {
+            background: #c82333;
         }
     </style>
 </head>
 <body>
-    <h1>Eliminar Componente</h1>
-    <div class="confirm-box">
-        <h2>¿Está seguro que desea eliminar este componente?</h2>
-        <p><strong>Tipo:</strong> {{ componente.get_tipo_display }}</p>
-        <p><strong>Título:</strong> {{ componente.titulo }}</p>
-        <p><strong>Actividad:</strong> {{ componente.actividad.titulo }}</p>
-        <p style="color: #856404; font-weight: bold;">Esta acción no se puede deshacer.</p>
-    </div>
-    <form method="post">
-        {% csrf_token %}
-        <div class="button-group">
-            <button type="submit">Sí, eliminar</button>
-            <a href="{% url 'teaching_sequence' %}" class="button">Cancelar</a>
+    <div class="edit-container">
+        <h1>Eliminar Componente</h1>
+        <div class="confirm-box">
+            <h2>¿Está seguro que desea eliminar este componente?</h2>
+            <p><strong>Tipo:</strong> {{ componente.get_tipo_display }}</p>
+            <p><strong>Título:</strong> {{ componente.titulo }}</p>
+            <p><strong>Actividad:</strong> {{ componente.actividad.titulo }}</p>
+            <p style="color: #856404; font-weight: bold;">Esta acción no se puede deshacer.</p>
         </div>
-    </form>
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin-top: 30px;">
+                <button type="submit" class="btn-eliminar">Sí, eliminar</button>
+                <a href="{% url 'teaching_sequence' %}" class="btn-cancelar">Cancelar</a>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
 

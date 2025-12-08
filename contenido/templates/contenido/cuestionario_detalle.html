@@ -1,106 +1,89 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    {% load static %}
+    <meta charset="utf-8">
+    <title>{{ cuestionario.titulo }}</title>
     <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
-    <title>Cuestionario: {{ cuestionario.titulo }}</title>
 </head>
 <body>
 
-
-<h1>Cuestionario: {{ cuestionario.titulo }}</h1>
-
-{% if cuestionario.descripcion %}
-<div>
-    {{ cuestionario.descripcion|safe }}
-</div>
-{% endif %}
-
-<hr>
-
-{% if mensaje %}
-    <p style="color: green;">{{ mensaje }}</p>
-{% endif %}
-
-{% if preguntas %}
-    {% if user.is_authenticated %}
-        {% if puede_acceder %}
-            <form method="post">
-                {% csrf_token %}
-                {% for pregunta in preguntas %}
-                    <div style="margin-bottom: 20px;">
-                        <strong>{{ forloop.counter }}. {{ pregunta.texto }}</strong><br>
-                        {% if pregunta.tipo == 'abierta' %}
-                            <textarea name="pregunta_{{ pregunta.id }}" rows="2" style="width:100%;"></textarea>
-                        {% elif pregunta.tipo == 'opcion_multiple' %}
-                            {% for opcion in pregunta.opciones.all %}
-                                <label>
-                                    <input type="radio" name="pregunta_{{ pregunta.id }}" value="{{ opcion.id }}"> {{ opcion.texto }}
-                                </label><br>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                {% endfor %}
-                <button type="submit">Enviar respuestas</button>
-            </form>
-        {% else %}
-            <div style="background-color: #ffe6e6; border: 2px solid #ff0000; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <h3 style="color: #cc0000; margin-top: 0;">Acceso restringido</h3>
-                <p style="color: #cc0000; margin-bottom: 0;">Has agotado el número máximo de intentos permitidos para este cuestionario. No puedes realizar más intentos.</p>
-            </div>
-            <p style="color: #666;">Si necesitas más intentos, contacta con el administrador del curso.</p>
-        {% endif %}
-    {% else %}
-        <p><a href="{% url 'login' %}?next={{ request.path }}">Inicia sesión para responder el cuestionario</a></p>
-    {% endif %}
-{% else %}
-    <p>No hay preguntas en este cuestionario.</p>
-{% endif %}
-<a href="{% url 'teaching_sequence' %}">Volver</a>
-
-{% if glosario_global or user.is_staff %}
-    <button class="btn-conceptos-global" onclick="toggleGlosario()">
-        📖 Recursos
-    </button>
-
-    <div id="caja-glosario" class="caja-conceptos-global">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #005599; padding-bottom: 10px; margin-bottom: 10px;">
-            <h3 style="margin: 0; color: #005599; font-size: 1.2rem;">
-                {{ glosario_global.titulo|default:"Recursos del Curso" }}
-            </h3>
-            <span onclick="toggleGlosario()" style="cursor: pointer; font-size: 1.5rem; color: #999;">&times;</span>
+    <header>
+        <div class="navbar">
+            <strong>Plataforma</strong>
+            <a href="{% url 'teaching_sequence' %}">Inicio</a>
+            <a href="#">Cursos</a>
+            <a href="#">Ayuda</a>
         </div>
+        <div style="float: right;">
+            {% if user.is_authenticated %}
+                {{ user.username }} | 
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button style="background:none;border:none;color:white;cursor:pointer;">Salir</button>
+                </form>
+            {% endif %}
+        </div>
+    </header>
 
-        <div style="font-size: 0.95rem; line-height: 1.5;">
-            {% if glosario_global %}
-                {{ glosario_global.contenido|safe }}
-            {% else %}
-                <p><em>No hay contenido definido aún.</em></p>
+    <div class="detalle-contenedor">
+        <a href="{% url 'teaching_sequence' %}" class="btn-volver-detalle">← Volver a la secuencia</a>
+
+        <div class="detalle-tarjeta-superior">
+            <h1 class="detalle-titulo">{{ cuestionario.titulo }}</h1>
+            <div class="descripcion">
+                {{ cuestionario.descripcion|safe }}
+            </div>
+             {% if user.is_staff %}
+                <div style="margin-top: 15px;">
+                     <a href="{% url 'editar_cuestionario_desc' componente_id=cuestionario.componente.id %}" style="color: #005599; font-weight: bold;">✏️ Editar instrucciones</a>
+                </div>
             {% endif %}
         </div>
 
-        {% if user.is_staff %}
-            <div style="margin-top: 15px; text-align: right;">
-                <a href="{% url 'editar_glosario_global' %}" style="background-color: #ff9800; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 0.8rem;">
-                    ✏️ Editar Contenido
-                </a>
-            </div>
-        {% endif %}
+        <div class="detalle-seccion-inferior">
+            <h2 class="detalle-subtitulo">📝 Preguntas del Cuestionario</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                {% for pregunta in preguntas %}
+                    <div style="background: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #005599; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <p style="font-weight: bold; font-size: 1.1rem; margin-top: 0;">{{ forloop.counter }}. {{ pregunta.texto }}</p>
+                        
+                        {% if pregunta.tipo == 'opcion_multiple' %}
+                            <div style="margin-left: 15px;">
+                                {% for opcion in pregunta.opciones.all %}
+                                    <div style="margin-bottom: 8px;">
+                                        <label style="cursor: pointer;">
+                                            <input type="radio" name="pregunta_{{ pregunta.id }}" value="{{ opcion.id }}" required>
+                                            {{ opcion.texto }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <textarea name="pregunta_{{ pregunta.id }}" rows="3" class="form-control" style="width: 100%; border: 1px solid #ccc; padding: 10px; border-radius: 4px;" placeholder="Escribe tu respuesta aquí..." required></textarea>
+                        {% endif %}
+                    </div>
+                {% endfor %} 
+                <button type="submit" class="btn-login" style="width: auto; padding: 12px 40px; margin-top: 10px;">Enviar Respuestas</button>
+            </form>
+        </div>
     </div>
-{% endif %}
 
-<script>
-    function toggleGlosario() {
-        var caja = document.getElementById('caja-glosario');
-        if (caja.style.display === "none" || caja.style.display === "") {
-            caja.style.display = "block";
-        } else {
-            caja.style.display = "none";
-        }
-    }
-</script>
+    {% if glosario_global or user.is_staff %}
+        <button class="btn-conceptos-global" onclick="toggleGlosario()">📖 Recursos</button>
+        <div id="caja-glosario" class="caja-conceptos-global">
+             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #005599; padding-bottom: 10px; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: #005599; font-size: 1.2rem;">{{ glosario_global.titulo|default:"Recursos" }}</h3>
+                <span onclick="toggleGlosario()" style="cursor: pointer; font-size: 1.5rem; color: #999;">&times;</span>
+            </div>
+            <div>{{ glosario_global.contenido|safe }}</div>
+            {% if user.is_staff %}<div style="text-align: right; margin-top:10px;"><a href="{% url 'editar_glosario_global' %}" style="background:#ff9800;color:white;padding:5px;text-decoration:none;border-radius:3px;font-size:0.8rem;">Editar</a></div>{% endif %}
+        </div>
+        <script>function toggleGlosario(){var c=document.getElementById('caja-glosario');c.style.display=(c.style.display==='none'||c.style.display==='')?'block':'none';}</script>
+    {% endif %}
 
 </body>
 </html>
-

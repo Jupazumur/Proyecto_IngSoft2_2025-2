@@ -1,88 +1,105 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    {% load static %}
+    <meta charset="utf-8">
+    <title>Foro: {{ foro.titulo }}</title>
     <link rel="stylesheet" href="{% static 'contenido/css/estilos.css' %}">
-    <title>{{ foro.titulo }}</title>
 </head>
 <body>
 
-<h1>Foro: {{ foro.titulo }}</h1>
-{% if user.is_authenticated %}
-<div>
-    {{ foro.descripcion|safe }}
-</div>
-
-<hr>
-
-<h2>Comentarios</h2>
-
-{% for comentario in comentarios %}
-    <div style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd;">
-        <strong>{{ comentario.usuario.username }}</strong>  
-        <em>{{ comentario.fecha }}</em>
-        <p>{{ comentario.texto }}</p>
-    </div>
-{% empty %}
-    <p>No hay comentarios.</p>
-{% endfor %}
-
-<hr>
-
-<form method="post">
-    {% csrf_token %}
-    <textarea name="texto" rows="4" style="width:100%;"></textarea>
-    <button type="submit">Publicar</button>
-</form>
-
-{% else %}
-<p><a href="{% url 'login' %}?next={{ request.path }}">Inicia sesión para ver y comentar</a></p>
-{% endif %}
-
-<a href="{% url 'teaching_sequence' %}">Volver</a>
-
-{% if glosario_global or user.is_staff %}
-    <button class="btn-conceptos-global" onclick="toggleGlosario()">
-        📖 Recursos
-    </button>
-
-    <div id="caja-glosario" class="caja-conceptos-global">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #005599; padding-bottom: 10px; margin-bottom: 10px;">
-            <h3 style="margin: 0; color: #005599; font-size: 1.2rem;">
-                {{ glosario_global.titulo|default:"Recursos del Curso" }}
-            </h3>
-            <span onclick="toggleGlosario()" style="cursor: pointer; font-size: 1.5rem; color: #999;">&times;</span>
+    <header>
+        <div class="navbar">
+            <strong>Plataforma</strong>
+            <a href="{% url 'teaching_sequence' %}">Inicio</a>
+            <a href="#">Cursos</a>
+            <a href="#">Ayuda</a>
         </div>
+        <div style="float: right;">
+            {% if user.is_authenticated %}
+                {{ user.username }} | 
+                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button style="background:none;border:none;color:white;cursor:pointer;">Salir</button>
+                </form>
+            {% endif %}
+        </div>
+    </header>
 
-        <div style="font-size: 0.95rem; line-height: 1.5;">
-            {% if glosario_global %}
-                {{ glosario_global.contenido|safe }}
-            {% else %}
-                <p><em>No hay contenido definido aún.</em></p>
+    <div class="detalle-contenedor">
+        
+        <a href="{% url 'teaching_sequence' %}" class="btn-volver-detalle">← Volver a la secuencia</a>
+
+        <div class="detalle-tarjeta-superior">
+            <h1 class="detalle-titulo">Foro: {{ foro.titulo }}</h1>
+            
+            <div class="descripcion">
+                {{ foro.descripcion|safe }}
+            </div>
+             {% if user.is_staff %}
+                <div style="margin-top: 15px;">
+                     <a href="{% url 'editar_foro' foro_id=foro.id %}" style="color: #005599; font-weight: bold;">✏️ Editar foro</a>
+                </div>
             {% endif %}
         </div>
 
-        {% if user.is_staff %}
-            <div style="margin-top: 15px; text-align: right;">
-                <a href="{% url 'editar_glosario_global' %}" style="background-color: #ff9800; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-size: 0.8rem;">
-                    ✏️ Editar Contenido
-                </a>
+        <div class="detalle-seccion-inferior">
+            <h2 class="detalle-subtitulo">💬 Comentarios</h2>
+
+            <div class="comment-list" style="margin-bottom: 30px;">
+                {% for comentario in comentarios %}
+                    <div style="background: white; padding: 15px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #ddd;">
+                        <div style="font-weight: bold; color: #003366; margin-bottom: 5px;">
+                            {{ comentario.usuario.username }} 
+                            <span style="font-weight: normal; font-size: 0.85rem; color: #777;"> - {{ comentario.fecha|date:"d M Y, H:i" }}</span>
+                        </div>
+                        <div style="color: #333; line-height: 1.5;">
+                            {{ comentario.texto|linebreaks }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p style="color: #777; font-style: italic;">No hay comentarios aún. ¡Sé el primero!</p>
+                {% endfor %}
             </div>
-        {% endif %}
+
+            <div style="background: #fff; padding: 20px; border-radius: 5px; border-top: 3px solid #005599; margin-top: 30px;">
+                <h4 style="margin-top:0; color: #003366;">Agregar comentario</h4>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label for="texto" style="display: block; margin-bottom: 5px; font-weight: bold; color: #444;">Tu mensaje:</label>
+                        
+                        <textarea 
+                            name="texto" 
+                            id="texto" 
+                            rows="4" 
+                            style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: sans-serif; font-size: 1rem; resize: vertical;" 
+                            placeholder="Escribe aquí tu opinión..." 
+                            required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-login" style="width: auto; padding: 10px 30px; cursor: pointer;">
+                        Publicar Comentario
+                    </button>
+                </form>
+            </div>
+        </div>
+
     </div>
-{% endif %}
 
-<script>
-    function toggleGlosario() {
-        var caja = document.getElementById('caja-glosario');
-        if (caja.style.display === "none" || caja.style.display === "") {
-            caja.style.display = "block";
-        } else {
-            caja.style.display = "none";
-        }
-    }
-</script>
-
+    {% if glosario_global or user.is_staff %}
+        <button class="btn-conceptos-global" onclick="toggleGlosario()">📖 Recursos</button>
+        <div id="caja-glosario" class="caja-conceptos-global">
+             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #005599; padding-bottom: 10px; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: #005599; font-size: 1.2rem;">{{ glosario_global.titulo|default:"Recursos" }}</h3>
+                <span onclick="toggleGlosario()" style="cursor: pointer; font-size: 1.5rem; color: #999;">&times;</span>
+            </div>
+            <div>{{ glosario_global.contenido|safe }}</div>
+            {% if user.is_staff %}<div style="text-align: right; margin-top:10px;"><a href="{% url 'editar_glosario_global' %}" style="background:#ff9800;color:white;padding:5px;text-decoration:none;border-radius:3px;font-size:0.8rem;">Editar</a></div>{% endif %}
+        </div>
+        <script>function toggleGlosario(){var c=document.getElementById('caja-glosario');c.style.display=(c.style.display==='none'||c.style.display==='')?'block':'none';}</script>
+    {% endif %} 
 </body>
 </html>
